@@ -2,277 +2,160 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>真实潜水呼吸监听 - Realistic Diving Breath</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>呼吸检测</title>
     <style>
-        :root {
-            --bg-color: #0a1628;
-            --text-color: #e2e8f0;
-            --accent-inhale: #0ea5e9;
-            --accent-exhale: #22d3ee;
-            --accent-idle: #475569;
-            --panel-bg: #111d32;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: radial-gradient(ellipse at top, #1e3a5f 0%, var(--bg-color) 100%);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
+            padding: 20px;
         }
-        .container { width: 90%; max-width: 420px; text-align: center; }
-        
-        /* 深海氛围背景 */
-        .ocean-bg {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
-            pointer-events: none;
-            z-index: -1;
+        .card {
+            background: #161b22;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            border: 1px solid #30363d;
         }
-        
-        h1 {
-            font-size: 1.4rem;
-            margin-bottom: 1.5rem;
+        h1 { font-size: 14px; color: #8b949e; letter-spacing: 2px; margin-bottom: 30px; }
+        .state {
+            font-size: 48px;
             font-weight: 300;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            color: #7dd3fc;
+            min-height: 60px;
+            transition: all 0.2s;
         }
-
-        /* 状态卡片 */
-        .status-card {
-            background: linear-gradient(145deg, var(--panel-bg), #0d1724);
-            border-radius: 24px;
-            padding: 2rem 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 
-                0 20px 40px -15px rgba(0, 0, 0, 0.6),
-                inset 0 1px 0 rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
+        .state.idle { color: #484f58; }
+        .state.inhale { color: #58a6ff; text-shadow: 0 0 30px rgba(88,166,255,0.5); }
+        .state.exhale { color: #3fb950; text-shadow: 0 0 30px rgba(63,185,80,0.5); }
         
-        .status-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--current-color, var(--accent-idle)), transparent);
-            opacity: 0.8;
-        }
-
-        .status-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; opacity: 0.5; margin-bottom: 0.5rem; }
-        
-        .status-value {
-            font-size: 3.5rem;
-            font-weight: 200;
-            margin: 10px 0;
-            font-variant-numeric: tabular-nums;
-            transition: color 0.3s ease;
-        }
-
-        /* 音量可视化 */
-        .meter-container {
-            background: rgba(0,0,0,0.3);
+        .volume-bar {
             height: 8px;
+            background: #21262d;
             border-radius: 4px;
+            margin: 20px 0;
             overflow: hidden;
-            margin-top: 15px;
-            position: relative;
         }
-        
-        .meter-bar {
+        .volume-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--accent-idle), var(--accent-inhale));
+            background: linear-gradient(90deg, #58a6ff, #3fb950);
+            transition: width 0.05s;
             border-radius: 4px;
-            transition: width 0.05s linear, background 0.3s ease;
-            box-shadow: 0 0 10px currentColor;
-        }
-
-        /* 音频指示器 */
-        .audio-viz {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-top: 15px;
-            height: 30px;
-            align-items: flex-end;
         }
         
-        .viz-bar {
-            width: 4px;
-            background: var(--accent-idle);
-            border-radius: 2px;
-            transition: height 0.1s ease, background 0.3s ease;
+        .info {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 15px;
+            line-height: 1.8;
         }
-
-        /* 开始按钮 */
-        #startBtn {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        .info span { color: #58a6ff; }
+        
+        button {
+            background: #238636;
             color: white;
             border: none;
-            padding: 18px 50px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            letter-spacing: 1px;
-            border-radius: 50px;
+            padding: 14px 40px;
+            font-size: 16px;
+            border-radius: 30px;
             cursor: pointer;
-            box-shadow: 
-                0 10px 30px -10px rgba(2, 132, 199, 0.5),
-                inset 0 1px 0 rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-        
-        #startBtn:active { transform: scale(0.96); }
-        #startBtn:disabled { opacity: 0.5; cursor: wait; }
-
-        .info-text {
-            font-size: 0.7rem;
-            color: #64748b;
             margin-top: 20px;
-            line-height: 1.6;
         }
-
-        /* 状态颜色 */
-        .state-idle { --current-color: var(--accent-idle); }
-        .state-idle .status-value { color: var(--accent-idle); }
-        .state-idle .meter-bar { background: var(--accent-idle); }
+        button:disabled { opacity: 0.5; }
         
-        .state-inhale { --current-color: var(--accent-inhale); }
-        .state-inhale .status-value { color: var(--accent-inhale); text-shadow: 0 0 30px rgba(14, 165, 233, 0.5); }
-        .state-inhale .meter-bar { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
-        
-        .state-exhale { --current-color: var(--accent-exhale); }
-        .state-exhale .status-value { color: var(--accent-exhale); text-shadow: 0 0 30px rgba(34, 211, 238, 0.5); }
-        .state-exhale .meter-bar { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
-
-        /* 视觉气泡效果 */
-        .bubble {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent);
-            border: 1px solid rgba(255,255,255,0.2);
-            pointer-events: none;
-            animation: rise 4s infinite ease-in;
-        }
-        
-        @keyframes rise {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        .debug {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #484f58;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
-    <div class="ocean-bg"></div>
-    <div class="container">
-        <h1>🤿 潜水呼吸监听</h1>
+    <div class="card">
+        <h1>呼吸状态检测</h1>
         
-        <div id="statusCard" class="status-card state-idle">
-            <div class="status-label">当前状态</div>
-            <div id="stateText" class="status-value">STANDBY</div>
-            
-            <div class="meter-container">
-                <div id="volumeBar" class="meter-bar"></div>
-            </div>
-            
-            <!-- 可视化条 -->
-            <div class="audio-viz" id="audioViz">
-                <div class="viz-bar" style="height: 5px;"></div>
-                <div class="viz-bar" style="height: 8px;"></div>
-                <div class="viz-bar" style="height: 12px;"></div>
-                <div class="viz-bar" style="height: 8px;"></div>
-                <div class="viz-bar" style="height: 5px;"></div>
-            </div>
+        <div id="state" class="state idle">待机</div>
+        
+        <div class="volume-bar">
+            <div id="volumeFill" class="volume-fill"></div>
         </div>
         
-        <button id="startBtn">开始呼吸追踪</button>
+        <button id="startBtn">开始</button>
         
-        <div class="info-text">
-            确保佩戴耳机麦克风 (如 AirPods)<br>
-            建议在安静环境使用
+        <div class="info">
+            对着手机<span>底部麦克风</span>呼吸<br>
+            短吹气 = 吸气 / 长吹气 = 呼气
         </div>
+        
+        <div class="debug" id="debug"></div>
     </div>
 
     <script>
-        /**
-         * 真实潜水音效合成引擎 (Procedural Audio Synthesis)
-         * 不使用外部音频文件，通过 Web Audio API 实时合成
-         */
-        
-        // === 配置参数 ===
+        // 配置参数
         const CONFIG = {
-            fftSize: 512,
-            smoothingTimeConstant: 0.85,
-            noiseThreshold: 0.035,      // 噪音门限
-            minStateDuration: 400,      // 状态切换最小持续时间(ms)
-            breathSensitivity: 1.2,     // 呼吸灵敏度
-            inhaleThreshold: 0.002,     // 吸气判定阈值
-            exhaleThreshold: -0.002     // 呼气判定阈值
+            threshold: 0.08,      // 触发阈值
+            inhaleMaxTime: 1200,  // 吸气最大持续时间(ms)
+            exhaleMinTime: 1500,  // 呼气最小持续时间(ms)
+            cooldown: 400,        // 状态切换冷却时间(ms)
+            minVolume: 0.1        // 有效呼吸最小音量
         };
 
-        // === 全局变量 ===
-        let audioCtx;
-        let analyser;
-        let microphoneStream;
+        let audioCtx, analyser;
         let isRunning = false;
-        let currentState = 'IDLE';
-        let lastStateChangeTime = 0;
-        let lastRMS = 0;
-        let predictedNextState = null;
         
-        // 音效节点
-        let inhaleSys, exhaleSys;   // 音效系统对象
-        let masterGain;
+        // 状态变量
+        let breathStartTime = null;
+        let breathPeakVolume = 0;
+        let lastState = 'idle';
+        let lastStateTime = 0;
+        let isBreathing = false;
 
-        // UI 元素
+        const stateEl = document.getElementById('state');
+        const volumeFill = document.getElementById('volumeFill');
+        const debugEl = document.getElementById('debug');
         const startBtn = document.getElementById('startBtn');
-        const stateText = document.getElementById('stateText');
-        const statusCard = document.getElementById('statusCard');
-        const volumeBar = document.getElementById('volumeBar');
-        const audioViz = document.getElementById('audioViz');
-        const vizBars = audioViz.querySelectorAll('.viz-bar');
 
-        // === 1. 初始化 ===
+        const STATE_TEXT = {
+            idle: '待机',
+            inhale: '吸气',
+            exhale: '呼气'
+        };
+
+        const STATE_CLASS = {
+            idle: 'idle',
+            inhale: 'inhale',
+            exhale: 'exhale'
+        };
+
         startBtn.addEventListener('click', async () => {
             startBtn.disabled = true;
-            startBtn.textContent = "正在启动...";
+            startBtn.textContent = '启动中...';
             
             try {
-                await initAudioSystem();
+                await initAudio();
                 startBtn.style.display = 'none';
-                statusCard.className = 'status-card state-idle';
-                stateText.innerText = 'READY';
                 isRunning = true;
-                
-                // 延迟一点让用户准备
-                setTimeout(() => {
-                    detectBreathLoop();
-                }, 500);
-            } catch (err) {
-                console.error(err);
-                alert("音频初始化失败: " + err.message);
+                detectLoop();
+            } catch (e) {
+                alert('麦克风权限被拒绝');
                 startBtn.disabled = false;
-                startBtn.textContent = "重试";
+                startBtn.textContent = '重试';
             }
         });
 
-        async function initAudioSystem() {
+        async function initAudio() {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext({ latencyHint: 'interactive' });
+            audioCtx = new AudioContext();
             
             if (audioCtx.state === 'suspended') {
                 await audioCtx.resume();
@@ -281,327 +164,110 @@
             // 获取麦克风
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
-                    deviceId: 'default',
                     echoCancellation: false,
                     noiseSuppression: false,
                     autoGainControl: false
                 }
             });
 
-            microphoneStream = audioCtx.createMediaStreamSource(stream);
-            
-            // 分析节点
+            const source = audioCtx.createMediaStreamSource(stream);
             analyser = audioCtx.createAnalyser();
-            analyser.fftSize = CONFIG.fftSize;
-            analyser.smoothingTimeConstant = CONFIG.smoothingTimeConstant;
-            microphoneStream.connect(analyser);
-
-            // 初始化音效引擎
-            masterGain = audioCtx.createGain();
-            masterGain.gain.value = 0.7;
-            masterGain.connect(audioCtx.destination);
-
-            // 创建两种音效系统
-            inhaleSys = createRegulatorSound();
-            exhaleSys = createBubbleSound();
+            analyser.fftSize = 512;
+            analyser.smoothingTimeConstant = 0.5;
+            source.connect(analyser);
         }
 
-        // === 2. 真实音效合成引擎 ===
+        function detectLoop() {
+            if (!isRunning) return;
+            requestAnimationFrame(detectLoop);
 
-        /**
-         * 创建调节器(二级头)吸气声音效
-         * 特征：气压释放的嘶嘶声 + 机械阀门Click声 + 呼吸气流
-         */
-        function createRegulatorSound() {
-            const container = { gain: null, nodes: [] };
-            
-            // 主音量控制
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.value = 0;
-            container.gain = gainNode;
+            // 获取音量
+            const rms = getVolume();
+            const now = Date.now();
 
-            // 1. 基础气流声 (低频噪音 100-400Hz)
-            const lowNoise = createFilteredNoise('brown', 150, 400);
-            const lowGain = audioCtx.createGain();
-            lowGain.gain.value = 0.6;
-            lowNoise.connect(lowGain);
-            lowGain.connect(gainNode);
-            container.nodes.push({ source: lowNoise, gain: lowGain });
+            // 更新音量条
+            const volPercent = Math.min(rms * 400, 100);
+            volumeFill.style.width = volPercent + '%';
 
-            // 2. 气压释放声 (中频嘶嘶 400-1200Hz) - 模拟气压阀门
-            const midNoise = createFilteredNoise('pink', 400, 1200);
-            const midGain = audioCtx.createGain();
-            midGain.gain.value = 0.4;
-            midNoise.connect(midGain);
-            midGain.connect(gainNode);
-            container.nodes.push({ source: midNoise, gain: midGain });
+            // 调试信息
+            debugEl.innerHTML = `音量: ${rms.toFixed(4)}<br>状态: ${lastState}`;
 
-            // 3. 高频气流 (2-5kHz) - 模拟气体通过Restricted孔径
-            const highNoise = createFilteredNoise('white', 2000, 5000);
-            const highGain = audioCtx.createGain();
-            highGain.gain.value = 0.15;
-            highNoise.connect(highGain);
-            highGain.connect(gainNode);
-            container.nodes.push({ source: highNoise, gain: highGain });
-
-            // 4. 随机脉冲 (模拟机械阀Click) - 低频周期性
-            const pulseOsc = audioCtx.createOscillator();
-            pulseOsc.type = 'sine';
-            pulseOsc.frequency.value = 3; // 3Hz 脉冲
-            const pulseGain = audioCtx.createGain();
-            pulseGain.gain.value = 0.08;
-            // 随机调制脉冲强度
-            const lfo = audioCtx.createOscillator();
-            lfo.frequency.value = 0.5;
-            const lfoGain = audioCtx.createGain();
-            lfoGain.gain.value = 0.5;
-            lfo.connect(lfoGain);
-            lfoGain.connect(pulseGain.gain);
-            lfo.start();
-            
-            pulseOsc.connect(pulseGain);
-            pulseGain.connect(gainNode);
-            container.nodes.push({ source: pulseOsc, gain: pulseGain, lfo: lfo });
-            
-            // 连接到主输出
-            gainNode.connect(masterGain);
-
-            return container;
-        }
-
-        /**
-         * 创建气泡/呼气声音效
-         * 特征：随机频率包络气泡音 + 水下低通共鸣
-         */
-        function createBubbleSound() {
-            const container = { gain: null };
-            
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.value = 0;
-            container.gain = gainNode;
-
-            // 1. 气泡基础：带通过滤的粉红噪音
-            const bubbleNoise = createFilteredNoise('pink', 300, 1200);
-            const bubbleGain = audioCtx.createGain();
-            bubbleGain.gain.value = 0.5;
-            bubbleNoise.connect(bubbleGain);
-            bubbleGain.connect(gainNode);
-
-            // 2. 气泡包络发生器 (LFO 模拟气泡随机性)
-            // 创建调制气泡强度的 LFO
-            const bubbleLFO = audioCtx.createOscillator();
-            bubbleLFO.type = 'sine';
-            bubbleLFO.frequency.value = 2.5; // 每秒2-3个大泡
-            
-            const lfoGain = audioCtx.createGain();
-            lfoGain.gain.value = 0.4; // 调制深度
-            
-            bubbleLFO.connect(lfoGain);
-            lfoGain.connect(bubbleGain.gain);
-            bubbleLFO.start();
-
-            // 3. 水下低频共振 (低通滤波后的低频，模拟水下压力感)
-            const underwaterLow = createFilteredNoise('brown', 30, 150);
-            const underwaterGain = audioCtx.createGain();
-            underwaterGain.gain.value = 0.3;
-            underwaterLow.connect(underwaterGain);
-            underwaterGain.connect(gainNode);
-
-            // 4. 高频气泡破裂声 (随机短促)
-            const crackNoise = createFilteredNoise('white', 1000, 4000);
-            const crackGain = audioCtx.createGain();
-            crackGain.gain.value = 0;
-            
-            // 随机触发高频破裂声
-            const crackLoop = () => {
-                if (!isRunning) return;
-                const now = audioCtx.currentTime;
-                crackGain.gain.setValueAtTime(0.1, now);
-                crackGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05 + Math.random() * 0.1);
-                setTimeout(crackLoop, 200 + Math.random() * 800);
-            };
-            crackNoise.connect(crackGain);
-            crackGain.connect(gainNode);
-            setTimeout(crackLoop, 1000);
-
-            container.nodes = [
-                { source: bubbleNoise, gain: bubbleGain, lfo: bubbleLFO },
-                { source: underwaterLow, gain: underwaterGain },
-                { source: crackNoise, gain: crackGain }
-            ];
-
-            gainNode.connect(masterGain);
-            return container;
-        }
-
-        /**
-         * 创建过滤噪音辅助函数
-         * @param {string} type - 噪音类型: white, pink, brown
-         * @param {number} lowFreq - 低频截止
-         * @param {number} highFreq - 高频截止
-         */
-        function createFilteredNoise(type, lowFreq, highFreq) {
-            const bufferSize = audioCtx.sampleRate * 2;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            
-            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-            
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                
-                if (type === 'white') {
-                    data[i] = white;
-                } else if (type === 'pink') {
-                    b0 = 0.99886 * b0 + white * 0.0555179;
-                    b1 = 0.99332 * b1 + white * 0.0750759;
-                    b2 = 0.96900 * b2 + white * 0.1538520;
-                    b3 = 0.86650 * b3 + white * 0.3104856;
-                    b4 = 0.55000 * b4 + white * 0.5329522;
-                    b5 = -0.7616 * b5 - white * 0.0168980;
-                    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-                    b6 = white * 0.115926;
-                } else if (type === 'brown') {
-                    data[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = data[i];
-                    data[i] *= 3.5;
+            // 检测逻辑
+            if (rms > CONFIG.threshold) {
+                // 开始呼吸
+                if (!isBreathing) {
+                    isBreathing = true;
+                    breathStartTime = now;
+                    breathPeakVolume = rms;
+                } else {
+                    // 更新峰值
+                    if (rms > breathPeakVolume) {
+                        breathPeakVolume = rms;
+                    }
+                    
+                    // 计算持续时间
+                    const duration = now - breathStartTime;
+                    
+                    // 冷却时间内不切换
+                    if (now - lastStateTime < CONFIG.cooldown) return;
+                    
+                    // 判断是吸气还是呼气
+                    if (duration < CONFIG.inhaleMaxTime && breathPeakVolume < CONFIG.minVolume * 2) {
+                        // 持续时间短 → 吸气
+                        if (lastState !== 'inhale') {
+                            setState('inhale', now);
+                        }
+                    } else if (duration > CONFIG.exhaleMinTime) {
+                        // 持续时间长 → 呼气
+                        if (lastState !== 'exhale') {
+                            setState('exhale', now);
+                        }
+                    }
+                }
+            } else {
+                // 呼吸结束
+                if (isBreathing) {
+                    isBreathing = false;
+                    breathStartTime = null;
+                    breathPeakVolume = 0;
+                    
+                    // 短暂延迟后恢复待机
+                    setTimeout(() => {
+                        if (!isBreathing) {
+                            setState('idle', Date.now());
+                        }
+                    }, 300);
                 }
             }
-
-            const source = audioCtx.createBufferSource();
-            source.buffer = buffer;
-            source.loop = true;
-
-            // 创建带通滤波器
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass';
-            filter.frequency.value = (lowFreq + highFreq) / 2;
-            filter.Q.value = (highFreq - lowFreq) / ((lowFreq + highFreq) / 2);
-            
-            source.connect(filter);
-            filter.type = 'lowpass';
-            filter.frequency.value = highFreq;
-
-            source.start();
-            return filter;
         }
 
-        let lastOut = 0;
-
-        // === 3. 呼吸检测核心 ===
-        
-        function detectBreathLoop() {
-            if (!isRunning) return;
-            requestAnimationFrame(detectBreathLoop);
-
-            const timeData = new Uint8Array(analyser.fftSize);
-            analyser.getByteTimeDomainData(timeData);
-
-            // 计算 RMS
+        function getVolume() {
+            const data = new Uint8Array(analyser.fftSize);
+            analyser.getByteTimeDomainData(data);
+            
             let sum = 0;
-            for (let i = 0; i < timeData.length; i++) {
-                const v = (timeData[i] - 128) / 128;
+            for (let i = 0; i < data.length; i++) {
+                const v = (data[i] - 128) / 128;
                 sum += v * v;
             }
-            const rms = Math.sqrt(sum / timeData.length);
-
-            // 可视化更新
-            updateVisualization(rms);
-
-            // 状态判定
-            const now = Date.now();
-            const timeSinceChange = now - lastStateChangeTime;
-
-            // 噪音门限
-            if (rms < CONFIG.noiseThreshold) {
-                transitionToState('IDLE');
-                return;
-            }
-
-            // 变化率检测
-            if (timeSinceChange > CONFIG.minStateDuration) {
-                const delta = (rms - lastRMS) * CONFIG.breathSensitivity;
-                
-                // 趋势预测
-                if (delta > CONFIG.inhaleThreshold) {
-                    transitionToState('INHALE');
-                } else if (delta < CONFIG.exhaleThreshold) {
-                    transitionToState('EXHALE');
-                }
-            }
-
-            // 平滑 RMS
-            lastRMS = lastRMS * 0.6 + rms * 0.4;
+            return Math.sqrt(sum / data.length);
         }
 
-        function transitionToState(newState) {
-            if (currentState === newState) return;
+        function setState(state, time) {
+            lastState = state;
+            lastStateTime = time;
+            stateEl.textContent = STATE_TEXT[state];
+            stateEl.className = 'state ' + STATE_CLASS[state];
             
-            currentState = newState;
-            lastStateChangeTime = Date.now();
-
-            // UI 更新
-            stateText.innerText = newState;
-            statusCard.className = `status-card state-${newState.toLowerCase()}`;
-
-            // 音效 Crossfade
-            const now = audioCtx.currentTime;
-            const fadeTime = 0.2; // 200ms 平滑过渡
-
-            if (newState === 'INHALE') {
-                // 吸气：调节器声音升起，气泡声淡出
-                inhaleSys.gain.gain.setTargetAtTime(1, now, fadeTime);
-                exhaleSys.gain.gain.setTargetAtTime(0, now, fadeTime);
-            } else if (newState === 'EXHALE') {
-                // 呼气：气泡声升起，调节器声淡出
-                inhaleSys.gain.gain.setTargetAtTime(0, now, fadeTime);
-                exhaleSys.gain.gain.setTargetAtTime(1, now, fadeTime);
+            // 音量条颜色
+            if (state === 'inhale') {
+                volumeFill.style.background = 'linear-gradient(90deg, #58a6ff, #79c0ff)';
+            } else if (state === 'exhale') {
+                volumeFill.style.background = 'linear-gradient(90deg, #3fb950, #56d364)';
             } else {
-                // IDLE
-                inhaleSys.gain.gain.setTargetAtTime(0, now, fadeTime);
-                exhaleSys.gain.gain.setTargetAtTime(0, now, fadeTime);
+                volumeFill.style.background = '#484f58';
             }
         }
-
-        // === 4. 可视化 ===
-        
-        function updateVisualization(rms) {
-            // 音量条
-            const vol = Math.min((rms / 0.2) * 100, 100);
-            volumeBar.style.width = `${vol}%`;
-
-            // 频谱条动画
-            const analyserData = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(analyserData);
-            
-            vizBars.forEach((bar, i) => {
-                const index = Math.floor(i * (analyserData.length / vizBars.length / 4));
-                const value = analyserData[index] / 255;
-                const height = 5 + value * 25;
-                bar.style.height = `${height}px`;
-                
-                // 根据状态改变颜色
-                if (currentState === 'INHALE') bar.style.background = '#0ea5e9';
-                else if (currentState === 'EXHALE') bar.style.background = '#22d3ee';
-                else bar.style.background = '#475569';
-            });
-        }
-
-        // === 5. 环境气泡装饰 (可选) ===
-        function createAmbientBubbles() {
-            for (let i = 0; i < 5; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                bubble.style.left = Math.random() * 100 + 'vw';
-                bubble.style.width = (5 + Math.random() * 10) + 'px';
-                bubble.style.height = bubble.style.width;
-                bubble.style.animationDelay = Math.random() * 5 + 's';
-                bubble.style.animationDuration = (3 + Math.random() * 3) + 's';
-                document.body.appendChild(bubble);
-            }
-        }
-        createAmbientBubbles();
-
     </script>
 </body>
 </html>
