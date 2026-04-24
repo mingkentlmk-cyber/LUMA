@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>潜水呼吸实时监听 - Diving Breath Tracker</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --accent-inhale: #38bdf8; /* 蓝色-吸气 */
+            --accent-exhale: #4ade80; /* 绿色-呼气 */
+            --accent-idle: #94a3b8;   /* 灰色-静止 */
+            --panel-bg: #1e293b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* 状态指示器 */
+        .status-card {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        .status-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 音量条 */
+        .meter-container {
+            background: #334155;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .meter-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-idle), var(--accent-inhale));
+            transition: width 0.1s linear;
+        }
+
+        /* 按钮 */
+        #startBtn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #startBtn:active {
+            transform: scale(0.95);
+        }
+
+        #startBtn:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .debug-info {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 20px;
+            text-align: left;
+            font-family: monospace;
+        }
+
+        /* 状态颜色类 */
+        .state-idle { color: var(--accent-idle); border-color: var(--accent-idle); }
+        .state-inhale { color: var(--accent-inhale); border-color: var(--accent-inhale); text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
+        .state-exhale { color: var(--accent-exhale); border-color: var(--accent-exhale); text-shadow: 0 0 20px rgba(74, 222, 128, 0.3); }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Diving Breath Tracker</h1>
+
+    <div id="statusCard" class="status-card state-idle">
+        <div class="status-label">Current State</div>
+        <div id="stateText" class="status-value">IDLE</div>
+        <div class="meter-container">
+            <div id="volumeBar" class="meter-bar"></div>
+        </div>
+    </div>
+
+    <button id="startBtn">点击开始 (Start)</button>
+
+    <div class="debug-info">
+        <div>RMS: <span id="debugRMS">0.00</span></div>
+        <div>Noise Gate: <span id="debugThreshold">0.04</span></div>
+        <div>Prediction: <span id="debugPred">Waiting...</span></div>
+    </div>
+</div>
+
+<script>
+    /**
+     * 核心配置参数
+     */
+    const CONFIG = {
+        fftSize: 512,              // 解析度，越小延迟越低
+        smoothingTimeConstant: 0.8,// 平滑系数 (0-1)，越高越平滑
+        noiseThreshold: 0.04,      // 噪音阈值 (0-1)，根据环境调整
+        minStateDuration: 300,     // 最小状态持续时间(毫秒)，防止误判抖动
+        audioLatency: 'interactive' // 音频延迟策略
+    };
+
+    /**
+     * 音频资产 (Base64 短音效占位符)
+     * 为了保证单文件运行，这里使用极短的数据URI。
+     * 实际项目中建议替换为真实的 .mp3 文件。
+     * 
+     * 声音1: 吸气 (类似呼吸器吸气声 - 滤波噪音)
+     * 声音2: 呼气 (类似气泡声 - 带通噪音)
+     */
+    const ASSETS = {
+        // 约1秒的粉红噪音模拟吸气 (低通滤波后)
+        inhale: "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU", 
+        // 约1秒的白噪音模拟气泡/呼气
+        exhale: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA="
+    };
+    // 注：上面的Base64是极简占位，实际由于太短无法形成听觉。
+    // 为了演示效果，我们将使用 Web Audio API 程序化生成噪音 Buffer，这样更可靠且无需庞大Base64字符串。
+
+    // --- 全局变量 ---
+    let audioCtx;
+    let analyser;
+    let microphoneStream;
+    let isRunning = false;
+    
+    // 音频节点
+    let inhaleSource, exhaleSource;
+    let inhaleGain, exhaleGain;
+    let masterGain;
+
+    // 状态管理
+    let currentState = 'IDLE'; // IDLE, INHALE, EXHALE
+    let lastStateChangeTime = 0;
+    let lastRMS = 0;
+
+    // UI 元素
+    const startBtn = document.getElementById('startBtn');
+    const stateText = document.getElementById('stateText');
+    const statusCard = document.getElementById('statusCard');
+    const volumeBar = document.getElementById('volumeBar');
+    const debugRMS = document.getElementById('debugRMS');
+    const debugPred = document.getElementById('debugPred');
+
+    // --- 1. 初始化音频系统 (iOS 兼容) ---
+    startBtn.addEventListener('click', async () => {
+        startBtn.disabled = true;
+        startBtn.textContent = "正在初始化...";
+
+        try {
+            await initAudioSystem();
+            startBtn.style.display = 'none'; // 隐藏按钮
+            isRunning = true;
+            detectBreathLoop(); // 启动循环
+        } catch (err) {
+            console.error(err);
+            alert("无法获取麦克风权限或音频设备出错: " + err.message);
+            startBtn.disabled = false;
+            startBtn.textContent = "重试";
+        }
+    });
+
+    async function initAudioSystem() {
+        // 1. 创建 AudioContext (必须用户手势触发)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext({ latencyHint: CONFIG.audioLatency });
+        
+        // iOS 需要恢复 Context
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        // 2. 获取麦克风输入 (优先默认设备，通常是AirPods)
+        // deviceId: 'default' 会自动选择系统偏好的输入设备
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: { 
+                deviceId: 'default',
+                echoCancellation: false, // 关闭回声消除，避免处理延迟
+                noiseSuppression: false, // 关闭降噪，保留原始声音
+                autoGainControl: false   // 关闭自动增益，我们需要原始音量
+            } 
+        });
+
+        microphoneStream = audioCtx.createMediaStreamSource(stream);
+
+        // 3. 分析节点
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = CONFIG.fftSize;
+        analyser.smoothingTimeConstant = CONFIG.smoothingTimeConstant;
+        microphoneStream.connect(analyser);
+
+        // 4. 音效系统构建
+        setupSoundEngine();
+    }
+
+    // --- 2. 音效引擎 (程序化生成 Buffer) ---
+    function setupSoundEngine() {
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.8;
+        masterGain.connect(audioCtx.destination);
+
+        // 创建两条音轨的 Gain 节点用于 Crossfade
+        inhaleGain = audioCtx.createGain();
+        exhaleGain = audioCtx.createGain();
+        
+        inhaleGain.gain.value = 0;
+        exhaleGain.gain.value = 0;
+
+        inhaleGain.connect(masterGain);
+        exhaleGain.connect(masterGain);
+
+        // 生成音效 Buffers (程序化生成以替代 Base64 链接)
+        const inhaleBuffer = createNoiseBuffer('pink'); // 吸气使用低沉噪音
+        const exhaleBuffer = createNoiseBuffer('white'); // 呼气使用高频气泡噪音
+
+        // 创建 Source 节点 (循环播放)
+        inhaleSource = audioCtx.createBufferSource();
+        inhaleSource.buffer = inhaleBuffer;
+        inhaleSource.loop = true;
+        inhaleSource.connect(inhaleGain);
+        inhaleSource.start();
+
+        exhaleSource = audioCtx.createBufferSource();
+        exhaleSource.buffer = exhaleBuffer;
+        exhaleSource.loop = true;
+        exhaleSource.connect(exhaleGain);
+        exhaleSource.start();
+    }
+
+    // 辅助：生成噪音 Buffer
+    function createNoiseBuffer(type) {
+        const bufferSize = audioCtx.sampleRate * 2; // 2秒循环
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        for (let i = 0; i < bufferSize; i++) {
+            if (type === 'white') {
+                data[i] = Math.random() * 2 - 1;
+            } else {
+                // 简单的粉红噪音近似 (1/f)
+                const white = Math.random() * 2 - 1;
+                data[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = data[i];
+                data[i] *= 3.5; // 补偿增益
+            }
+        }
+        return buffer;
+    }
+    let lastOut = 0;
+
+    // --- 3. 实时分析与呼吸检测核心 ---
+    function detectBreathLoop() {
+        if (!isRunning) return;
+        requestAnimationFrame(detectBreathLoop);
+
+        // 获取时域数据计算 RMS (音量)
+        const timeData = new Uint8Array(analyser.fftSize);
+        analyser.getByteTimeDomainData(timeData);
+
+        let sum = 0;
+        for (let i = 0; i < timeData.length; i++) {
+            // 转换 0-255 到 -1 到 1
+            const v = (timeData[i] - 128) / 128;
+            sum += v * v;
+        }
+        const rms = Math.sqrt(sum / timeData.length);
+
+        // 调试数据
+        debugRMS.innerText = rms.toFixed(4);
+
+        // --- 状态机逻辑 ---
+        const now = Date.now();
+        const timeSinceChange = now - lastStateChangeTime;
+
+        // 1. 阈值过滤 (Noise Gate)
+        if (rms < CONFIG.noiseThreshold) {
+            setTargetState('IDLE', timeSinceChange);
+        } else {
+            // 2. 方向判定 (Inhale vs Exhale)
+            // 策略：比较当前 RMS 和 上一次 RMS
+            // 吸气：肺活量增加，气流通常更平滑，音量可能稳定或略升
+            // 呼气：呼出气流通常更湍急，音量通常较大
+            // *注意：这是一个简化的物理模型。实际AirPods Mic会有风声干扰。
+            // 更好的策略：检测斜率。
+            
+            // Delta (变化量)
+            const delta = rms - lastRMS;
+            
+            // 判定逻辑：
+            // 如果 Delta > 0 (声音在变大) -> 可能是 吸气 (Inhale)
+            // 如果 Delta < 0 (声音在变小) -> 可能是 呼气 (Exhale)
+            // 为了稳定性，加入了最小持续时间锁 (Rhythm Locking)
+            
+            if (timeSinceChange > CONFIG.minStateDuration) {
+                if (delta > 0.001) {
+                    setTargetState('INHALE', timeSinceChange);
+                } else if (delta < -0.001) {
+                    setTargetState('EXHALE', timeSinceChange);
+                }
+            }
+        }
+
+        // 更新历史数据
+        // 使用线性插值平滑 RMS，避免突变
+        lastRMS = lastRMS * 0.7 + rms * 0.3; 
+
+        // 更新 UI 音量条
+        const displayVol = Math.min((rms / 0.3) * 100, 100); // 0.3 假设为最大 sensible volume
+        volumeBar.style.width = `${displayVol}%`;
+        
+        // 根据状态改变音量条颜色
+        if(currentState === 'INHALE') volumeBar.style.background = 'var(--accent-inhale)';
+        else if(currentState === 'EXHALE') volumeBar.style.background = 'var(--accent-exhale)';
+        else volumeBar.style.background = 'var(--accent-idle)';
+    }
+
+    // --- 4. 状态控制与 Crossfade ---
+    function setTargetState(newState, duration) {
+        if (currentState === newState) return;
+
+        currentState = newState;
+        lastStateChangeTime = Date.now();
+
+        // UI 更新
+        stateText.innerText = newState;
+        statusCard.className = `status-card state-${newState.toLowerCase()}`;
+        debugPred.innerText = `Locked for ${(CONFIG.minStateDuration/1000).toFixed(1)}s`;
+
+        // 音频 Crossfade (使用 setTargetAtTime 平滑过渡)
+        const now = audioCtx.currentTime;
+        const rampTime = 0.15; // 150ms 渐变时间，避免爆音
+
+        if (newState === 'INHALE') {
+            // 吸气声升起，气泡声消失
+            inhaleGain.gain.setTargetAtTime(1, now, rampTime);
+            exhaleGain.gain.setTargetAtTime(0, now, rampTime);
+        } else if (newState === 'EXHALE') {
+            // 气泡声升起，吸气声消失
+            inhaleGain.gain.setTargetAtTime(0, now, rampTime);
+            exhaleGain.gain.setTargetAtTime(1, now, rampTime);
+        } else {
+            // IDLE
+            inhaleGain.gain.setTargetAtTime(0, now, rampTime);
+            exhaleGain.gain.setTargetAtTime(0, now, rampTime);
+        }
+    }
+
+</script>
+</body>
+</html>
