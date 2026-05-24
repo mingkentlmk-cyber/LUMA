@@ -2,757 +2,792 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>潜水呼吸模拟器</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>CS Target Gun Final</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0a1628;
-  color: #e6edf3;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow: hidden;
-}
-
-.bg-bubbles {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.bubble {
-  position: absolute;
-  bottom: -50px;
-  background: rgba(88, 166, 255, 0.15);
-  border-radius: 50%;
-  animation: rise linear infinite;
-}
-
-@keyframes rise {
-  0% { transform: translateY(0) scale(1); opacity: 0.6; }
-  100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
-}
-
-.card {
-  position: relative;
-  z-index: 1;
-  background: linear-gradient(145deg, #0d1f35, #0a1628);
-  border-radius: 24px;
-  padding: 40px 30px;
-  width: 100%;
-  max-width: 340px;
-  text-align: center;
-  border: 1px solid #1e3a5f;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-
-.depth-display {
-  font-size: 64px;
-  font-weight: 200;
-  color: #58a6ff;
-  text-shadow: 0 0 40px rgba(88, 166, 255, 0.4);
-  line-height: 1;
-}
-
-.depth-unit {
-  font-size: 16px;
-  color: #58a6ff;
-  opacity: 0.6;
-  margin-left: 8px;
-}
-
-.depth-label {
-  font-size: 11px;
-  color: #484f58;
-  letter-spacing: 3px;
-  margin-top: 8px;
-}
-
-.state-ring {
-  width: 180px;
-  height: 180px;
-  margin: 30px auto;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.state-ring svg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.state-ring circle {
-  fill: none;
-  stroke-width: 4;
-}
-
-.state-ring .bg {
-  stroke: #1e3a5f;
-}
-
-.state-ring .progress {
-  stroke: #58a6ff;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.1s, stroke 0.3s;
-  filter: drop-shadow(0 0 8px currentColor);
-}
-
-.state-ring .breathing-icon {
-  font-size: 48px;
-  transition: all 0.3s;
-}
-
-.state-ring.idle .breathing-icon { color: #484f58; }
-.state-ring.inhale .breathing-icon { color: #79c0ff; }
-.state-ring.exhale .breathing-icon { color: #3fb950; }
-
-.volume-bar {
-  height: 6px;
-  background: #0d1f35;
-  border-radius: 3px;
-  margin: 25px 0;
-  overflow: hidden;
-}
-
-.volume-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #58a6ff, #3fb950);
-  border-radius: 3px;
-  transition: width 0.05s;
-}
-
-.info {
-  font-size: 12px;
-  color: #484f58;
-  line-height: 1.8;
-}
-
-.info span { color: #58a6ff; }
-
-button {
-  background: linear-gradient(135deg, #238636, #2ea043);
-  color: white;
-  border: none;
-  padding: 16px 50px;
-  font-size: 16px;
-  border-radius: 30px;
-  cursor: pointer;
-  margin-top: 25px;
-  font-weight: 500;
-  box-shadow: 0 4px 20px rgba(35, 134, 54, 0.4);
-  transition: all 0.2s;
-}
-
-button:active { transform: scale(0.96); }
-button:disabled { opacity: 0.5; }
-
-.depth-indicator {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 200px;
-  width: 4px;
-  background: #1e3a5f;
-  border-radius: 2px;
-}
-
-.depth-fill {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: #58a6ff;
-  border-radius: 2px;
-  transition: height 0.3s;
-  box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
-}
-
-.debug {
-  margin-top: 20px;
-  font-size: 10px;
-  color: #30363d;
-  font-family: monospace;
-}
+html,body{margin:0;overflow:hidden;background:#050505;font-family:Arial,sans-serif;touch-action:none}
+canvas{display:block}
+#start{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;color:#ddd;background:radial-gradient(circle,#202020,#050505 70%)}
+#start h1{margin:0 0 12px;color:#e8c86c;font-size:40px;letter-spacing:2px;text-shadow:0 0 18px #000}
+#start p{max-width:620px;line-height:1.7;color:#aaa;padding:0 22px}
+#ui{position:fixed;inset:0;pointer-events:none;color:#fff}
+#top{position:fixed;top:15px;left:15px;font-weight:700;line-height:1.55;text-shadow:0 2px 5px #000}
+#hp{position:fixed;left:22px;bottom:22px;font-size:28px;font-weight:800;color:#87ff8c;text-shadow:0 2px 5px #000}
+#ammo{position:fixed;right:22px;bottom:22px;font-size:34px;font-weight:800;color:#e8d484;text-shadow:0 2px 5px #000}
+#wp{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:6px;pointer-events:auto}
+.w{padding:7px 9px;border-radius:9px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.22);font-size:12px;font-weight:800;color:#ddd}
+.w.on{background:#e8d484;color:#111;box-shadow:0 0 16px rgba(232,212,132,.28)}
+#cross{position:fixed;left:50%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%);transition:.1s;opacity:.9}
+#cross:before,#cross:after{content:"";position:absolute;background:#fff;box-shadow:0 0 5px #000}
+#cross:before{left:14px;top:0;width:2px;height:30px}
+#cross:after{left:0;top:14px;width:30px;height:2px}
+.aim #cross{width:18px;height:18px;opacity:.55}
+.aim #cross:before{left:8px;height:18px}
+.aim #cross:after{top:8px;width:18px}
+#hit{position:fixed;left:50%;top:50%;width:42px;height:42px;border:3px solid #ff4040;border-radius:50%;transform:translate(-50%,-50%) scale(.25);opacity:0;transition:.06s}
+#mobile{display:none;position:fixed;inset:0;z-index:5;pointer-events:none}
+#move,#look,#fire,#ads,#reload{position:absolute;pointer-events:auto}
+#move{left:24px;bottom:70px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+#look{right:0;top:0;width:48%;height:100%}
+#fire{right:34px;bottom:82px;width:92px;height:92px;border-radius:50%;background:rgba(200,30,30,.45);border:2px solid rgba(255,120,120,.6);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+#ads{right:140px;bottom:96px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+#reload{right:46px;bottom:190px;width:70px;height:44px;border-radius:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+@media(max-width:900px){#mobile{display:block}#start h1{font-size:30px}}
 </style>
 </head>
+
 <body>
-
-<div class="bg-bubbles" id="bgBubbles"></div>
-
-<div class="card">
-  <div class="depth-label">当前深度</div>
-  <div class="depth-display">
-    <span id="depthValue">0</span><span class="depth-unit">m</span>
-  </div>
-  
-  <div class="state-ring idle" id="stateRing">
-    <svg viewBox="0 0 100 100">
-      <circle class="bg" cx="50" cy="50" r="45"/>
-      <circle class="progress" id="progressRing" cx="50" cy="50" r="45" 
-              stroke-dasharray="283" stroke-dashoffset="283"/>
-    </svg>
-    <div class="breathing-icon" id="breathIcon">⚪</div>
-  </div>
-  
-  <div class="volume-bar">
-    <div class="volume-fill" id="volumeFill"></div>
-  </div>
-  
-  <div class="info">
-    对着手机<span>底部麦克风</span>呼吸<br>
-    <span style="color:#79c0ff">短吹气</span> = 吸气 | <span style="color:#3fb950">长吹气</span> = 吐气
-  </div>
-  
-  <button id="startBtn">开始潜水</button>
+<div id="start">
+  <h1>CS TARGET GUN FINAL</h1>
+  <p>点击开始。电脑：WASD 移动，鼠标视角，长按左键连射，右键瞄准，滚轮/数字键切枪，R 换弹，Space 二段跳。手机：左下移动，右侧滑动视角，长按 FIRE，ADS 瞄准。</p>
 </div>
 
-<script>
-// ═══════════════════════════════════════════════════════
-// 潜水呼吸音效引擎
-// ═══════════════════════════════════════════════════════
+<div id="ui">
+  <div id="top">TARGETS: <span id="kill">0</span> / 12<br>MODE: DETAILED GUN FINAL</div>
+  <div id="cross"></div>
+  <div id="hit"></div>
+  <div id="hp">HP 100</div>
+  <div id="ammo">Rifle 30 / 90</div>
+  <div id="wp">
+    <div class="w" data-w="pistol">1 手枪</div>
+    <div class="w" data-w="shotgun">2 散弹</div>
+    <div class="w on" data-w="rifle">3 步枪</div>
+    <div class="w" data-w="lmg">4 机枪</div>
+    <div class="w" data-w="sniper">5 狙击</div>
+  </div>
+</div>
 
-class DiveSoundEngine {
-  constructor() {
-    this.ctx = null;
-    this.isInit = false;
-    
-    // 主音量
-    this.masterGain = null;
-    
-    // 吸气相关
-    this.inhaleNodes = null;
-    this.inhaleGain = null;
-    
-    // 吐气相关
-    this.exhaleNodes = null;
-    this.exhaleGain = null;
-    
-    // 气泡生成器
-    this.bubbleTimeout = null;
-  }
-  
-  async init() {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    this.ctx = new AudioContext();
-    
-    if (this.ctx.state === 'suspended') {
-      await this.ctx.resume();
-    }
-    
-    // 主音量
-    this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.value = 0.7;
-    this.masterGain.connect(this.ctx.destination);
-    
-    // 初始化两个通道
-    this.inhaleNodes = this.createInhaleNodes();
-    this.exhaleNodes = this.createExhaleNodes();
-    
-    // 初始音量设为0
-    this.inhaleGain = this.ctx.createGain();
-    this.inhaleGain.gain.value = 0;
-    this.inhaleNodes.output.connect(this.inhaleGain);
-    this.inhaleGain.connect(this.masterGain);
-    
-    this.exhaleGain = this.ctx.createGain();
-    this.exhaleGain.gain.value = 0;
-    this.exhaleNodes.output.connect(this.exhaleGain);
-    this.exhaleGain.connect(this.masterGain);
-    
-    this.isInit = true;
-  }
-  
-  // 创建吸气音效（尖啸的高频气流声）
-  createInhaleNodes() {
-    const output = this.ctx.createGain();
-    output.gain.value = 1;
-    
-    // 1. 白噪声源
-    const bufferSize = this.ctx.sampleRate * 2;
-    const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
-    
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = noiseBuffer;
-    noise.loop = true;
-    
-    // 2. 高通滤波器（模拟气流尖啸）
-    const highpass = this.ctx.createBiquadFilter();
-    highpass.type = 'highpass';
-    highpass.frequency.value = 2000;
-    highpass.Q.value = 2;
-    
-    // 3. 带通滤波器（增加金属感）
-    const bandpass = this.ctx.createBiquadFilter();
-    bandpass.type = 'bandpass';
-    bandpass.frequency.value = 3500;
-    bandpass.Q.value = 5;
-    
-    // 4. 另一个噪声用于高频啸叫
-    const hissBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const hissData = hissBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      hissData[i] = Math.random() * 2 - 1;
-    }
-    
-    const hiss = this.ctx.createBufferSource();
-    hiss.buffer = hissBuffer;
-    hiss.loop = true;
-    
-    const hissFilter = this.ctx.createBiquadFilter();
-    hissFilter.type = 'highpass';
-    hissFilter.frequency.value = 6000;
-    hissFilter.Q.value = 3;
-    
-    const hissGain = this.ctx.createGain();
-    hissGain.gain.value = 0.3;
-    
-    // 5. 低频振荡器模拟气流通过阀门
-    const lfo = this.ctx.createOscillator();
-    lfo.frequency.value = 8;
-    lfo.type = 'sine';
-    
-    const lfoGain = this.ctx.createGain();
-    lfoGain.gain.value = 500;
-    
-    const lfoFilter = this.ctx.createBiquadFilter();
-    lfoFilter.type = 'bandpass';
-    lfoFilter.frequency.value = 3000;
-    lfoFilter.Q.value = 2;
-    
-    // 连接节点
-    noise.connect(highpass);
-    highpass.connect(bandpass);
-    bandpass.connect(output);
-    
-    hiss.connect(hissFilter);
-    hissFilter.connect(hissGain);
-    hissGain.connect(output);
-    
-    lfo.connect(lfoGain);
-    lfoGain.connect(lfoFilter);
-    lfoFilter.connect(output);
-    
-    // 启动
-    noise.start();
-    hiss.start();
-    lfo.start();
-    
-    return { output, noise, hiss, lfo, highpass, bandpass, hissFilter, lfoFilter };
-  }
-  
-  // 创建吐气音效（大量气泡）
-  createExhaleNodes() {
-    const output = this.ctx.createGain();
-    output.gain.value = 1;
-    
-    // 1. 低频基础（气泡在水下的低沉感）
-    const bufferSize = this.ctx.sampleRate * 2;
-    const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
-    
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = noiseBuffer;
-    noise.loop = true;
-    
-    // 低通滤波
-    const lowpass = this.ctx.createBiquadFilter();
-    lowpass.type = 'lowpass';
-    lowpass.frequency.value = 800;
-    lowpass.Q.value = 1;
-    
-    // 2. 中频气泡声
-    const bubbleNoise = this.ctx.createBufferSource();
-    bubbleNoise.buffer = noiseBuffer;
-    bubbleNoise.loop = true;
-    
-    const bandpass = this.ctx.createBiquadFilter();
-    bandpass.type = 'bandpass';
-    bandpass.frequency.value = 400;
-    bandpass.Q.value = 2;
-    
-    const bubbleGain = this.ctx.createGain();
-    bubbleGain.gain.value = 0.8;
-    
-    // 3. 高频爆裂声（随机气泡）
-    const crackleBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const crackleData = crackleBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      crackleData[i] = Math.random() * 2 - 1;
-    }
-    
-    const crackle = this.ctx.createBufferSource();
-    crackle.buffer = crackleBuffer;
-    crackle.loop = true;
-    
-    const highpass = this.ctx.createBiquadFilter();
-    highpass.type = 'highpass';
-    highpass.frequency.value = 1500;
-    highpass.Q.value = 1;
-    
-    const crackleGain = this.ctx.createGain();
-    crackleGain.gain.value = 0.4;
-    
-    // 连接
-    noise.connect(lowpass);
-    lowpass.connect(output);
-    
-    bubbleNoise.connect(bandpass);
-    bandpass.connect(bubbleGain);
-    bubbleGain.connect(output);
-    
-    crackle.connect(highpass);
-    highpass.connect(crackleGain);
-    crackleGain.connect(output);
-    
-    // 启动
-    noise.start();
-    bubbleNoise.start();
-    crackle.start();
-    
-    return { output, noise, bubbleNoise, crackle, lowpass, bandpass, highpass, bubbleGain, crackleGain };
-  }
-  
-  // 设置吸气音量（0-1，根据用户力度）
-  setInhaleVolume(vol) {
-    if (!this.isInit || !this.inhaleGain) return;
-    const targetVol = Math.min(vol * 2, 1);
-    this.inhaleGain.gain.linearRampToValueAtTime(
-      targetVol, 
-      this.ctx.currentTime + 0.05
-    );
-  }
-  
-  // 设置吐气音量（0-1，根据用户力度）
-  setExhaleVolume(vol) {
-    if (!this.isInit || !this.exhaleGain) return;
-    const targetVol = Math.min(vol * 2.5, 1);
-    this.exhaleGain.gain.linearRampToValueAtTime(
-      targetVol,
-      this.ctx.currentTime + 0.05
-    );
-  }
-  
-  // 停止所有声音
-  stopAll() {
-    if (!this.isInit) return;
-    if (this.inhaleGain) {
-      this.inhaleGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
-    }
-    if (this.exhaleGain) {
-      this.exhaleGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
-    }
-  }
-  
-  // 释放资源
-  dispose() {
-    if (this.ctx) {
-      this.ctx.close();
-    }
-  }
-}
+<div id="mobile">
+  <div id="move"></div>
+  <div id="look"></div>
+  <div id="reload">R</div>
+  <div id="ads">ADS</div>
+  <div id="fire">FIRE</div>
+</div>
 
-// ═══════════════════════════════════════════════════════
-// 检测和控制逻辑
-// ═══════════════════════════════════════════════════════
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-const CONFIG = {
-  threshold: 0.06,
-  inhaleMaxTime: 3500,   // 吸气最大3.5秒
-  exhaleMinTime: 2000,   // 吐气最小2秒
-  maxInhaleTime: 5000,   // 吸气最常5秒
-  maxExhaleTime: 15000,  // 吐气最常15秒
-  pauseTime: 1500,       // 暂停1.5秒
-  minVolume: 0.08,
-  cooldown: 300
+let scene,camera,renderer,clock,audio;
+let yaw=0,pitch=0,aim=false,fire=false,reloading=false,nextShot=0;
+let kills=0,hp=100,shake=0,velY=0,jumpCount=0;
+
+const W={
+  pistol:{n:'Pistol',mag:12,a:12,r:72,delay:245,dmg:55,sp:.006,asp:.0028,rec:.034,auto:false,pel:1},
+  shotgun:{n:'Shotgun',mag:8,a:8,r:40,delay:620,dmg:28,sp:.058,asp:.038,rec:.115,auto:false,pel:9},
+  rifle:{n:'Rifle',mag:30,a:30,r:90,delay:105,dmg:42,sp:.010,asp:.0025,rec:.055,auto:true,pel:1},
+  lmg:{n:'LMG',mag:75,a:75,r:150,delay:74,dmg:25,sp:.018,asp:.008,rec:.07,auto:true,pel:1},
+  sniper:{n:'Sniper',mag:5,a:5,r:25,delay:950,dmg:130,sp:.002,asp:.0005,rec:.15,auto:false,pel:1}
 };
 
-let audioEngine = null;
-let audioCtx = null;
-let analyser = null;
-let isRunning = false;
+const order=['pistol','shotgun','rifle','lmg','sniper'];
+let cur='rifle',ammo=W[cur].a,reserve=W[cur].r;
+let keys={},moveTouch=null,lookTouch=null,moveVec={x:0,y:0},lastLook={x:0,y:0};
 
-// 状态变量
-let breathStartTime = null;
-let breathPeakVolume = 0;
-let breathStartVolume = 0;
-let lastState = 'idle';
-let lastStateTime = 0;
-let isBreathing = false;
-let currentPhase = 'idle'; // idle, inhale, pause, exhale
+const eye=1.7;
+const player={pos:new THREE.Vector3(0,eye,8),r:.45};
+const boxes=[],targets=[],crates=[],ray=new THREE.Raycaster();
+const $=id=>document.getElementById(id);
+const hit=$('hit');
 
-// 深度相关
-let currentDepth = 0;
-let targetDepth = 0;
+init();
+loop();
 
-// DOM元素
-const stateRing = document.getElementById('stateRing');
-const progressRing = document.getElementById('progressRing');
-const breathIcon = document.getElementById('breathIcon');
-const volumeFill = document.getElementById('volumeFill');
-const depthValue = document.getElementById('depthValue');
-const depthFill = document.querySelector('.depth-fill');
-const startBtn = document.getElementById('startBtn');
-const bgBubbles = document.getElementById('bgBubbles');
+function init(){
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0b0c0d);
+  scene.fog=new THREE.Fog(0x0b0c0d,18,55);
 
-const PHASE_CONFIG = {
-  idle: { icon: '⚪', color: '#484f58', maxTime: 0 },
-  inhale: { icon: '◉', color: '#58a6ff', maxTime: CONFIG.maxInhaleTime },
-  pause: { icon: '◌', color: '#8b949e', maxTime: CONFIG.pauseTime },
-  exhale: { icon: '◎', color: '#3fb950', maxTime: CONFIG.maxExhaleTime }
-};
+  clock=new THREE.Clock();
+  camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,300);
 
-// 气泡背景
-function createBubble() {
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  const size = Math.random() * 20 + 5;
-  bubble.style.width = size + 'px';
-  bubble.style.height = size + 'px';
-  bubble.style.left = Math.random() * 100 + '%';
-  bubble.style.animationDuration = (Math.random() * 8 + 6) + 's';
-  bgBubbles.appendChild(bubble);
-  
-  setTimeout(() => {
-    bubble.remove();
-  }, 14000);
+  renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  document.body.appendChild(renderer.domElement);
+
+  scene.add(new THREE.HemisphereLight(0xffffff,0x202020,1.12));
+
+  let sun=new THREE.DirectionalLight(0xffefc2,2.1);
+  sun.position.set(8,18,7);
+  sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024);
+  scene.add(sun);
+
+  let warm=new THREE.PointLight(0xff9a2f,2.2,19);
+  warm.position.set(-6,4,-8);
+  scene.add(warm);
+
+  let blue=new THREE.PointLight(0x5ca8ff,1.8,19);
+  blue.position.set(7,5,2);
+  scene.add(blue);
+
+  map();
+  gun();
+  spawnTargets();
+  events();
+  mobile();
 }
 
-function startBubbles() {
-  createBubble();
-  setInterval(createBubble, 400);
+function initAudio(){
+  audio ||= new (window.AudioContext||window.webkitAudioContext)();
 }
 
-startBtn.addEventListener('click', async () => {
-  startBtn.disabled = true;
-  startBtn.textContent = '启动中...';
-  
-  try {
-    await initAudio();
-    audioEngine = new DiveSoundEngine();
-    await audioEngine.init();
-    
-    startBtn.style.display = 'none';
-    isRunning = true;
-    startBubbles();
-    detectLoop();
-  } catch (e) {
-    console.error(e);
-    alert('麦克风权限被拒绝: ' + e.message);
-    startBtn.disabled = false;
-    startBtn.textContent = '重试';
-  }
-});
+function tone(f,d,type='square',v=.1,s=0){
+  if(!audio)return;
+  let t=audio.currentTime;
+  let o=audio.createOscillator();
+  let g=audio.createGain();
+  let lp=audio.createBiquadFilter();
 
-async function initAudio() {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioCtx = new AudioContext();
-  
-  if (audioCtx.state === 'suspended') {
-    await audioCtx.resume();
+  o.type=type;
+  o.frequency.setValueAtTime(f,t);
+  if(s)o.frequency.exponentialRampToValueAtTime(Math.max(40,f+s),t+d);
+
+  lp.type='lowpass';
+  lp.frequency.value=1700;
+
+  g.gain.setValueAtTime(v,t);
+  g.gain.exponentialRampToValueAtTime(.001,t+d);
+
+  o.connect(lp);
+  lp.connect(g);
+  g.connect(audio.destination);
+  o.start(t);
+  o.stop(t+d);
+}
+
+function sfx(n){
+  if(n==='shot'){
+    tone(90,.05,'sawtooth',.16,-40);
+    tone(520,.03,'square',.035,-260);
   }
-  
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      echoCancellation: false,
-      noiseSuppression: false,
-      autoGainControl: false
+  if(n==='empty')tone(185,.07,'square',.075,-40);
+  if(n==='reload'){
+    tone(220,.055,'triangle',.075);
+    setTimeout(()=>tone(330,.055,'triangle',.07),230);
+    setTimeout(()=>tone(140,.07,'square',.07),530);
+  }
+  if(n==='hit')tone(760,.05,'triangle',.08,-170);
+  if(n==='head')tone(1160,.065,'square',.095,-380);
+  if(n==='jump')tone(355,.045,'triangle',.045);
+}
+
+function mat(c,r=.8,m=0){
+  return new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+}
+
+function box(w,h,d,x,y,z,material,stand=true){
+  let mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+  mesh.position.set(x,y,z);
+  mesh.castShadow=mesh.receiveShadow=true;
+  scene.add(mesh);
+  boxes.push({mesh,w,h,d,stand,top:y+h/2});
+  return mesh;
+}
+
+function map(){
+  let floor=new THREE.Mesh(new THREE.PlaneGeometry(50,50),mat(0x343432,.9));
+  floor.rotation.x=-Math.PI/2;
+  floor.receiveShadow=true;
+  scene.add(floor);
+
+  scene.add(new THREE.GridHelper(50,50,0x5d5d5d,0x242424));
+
+  let wall=mat(0x47433b);
+  let concrete=mat(0x666052);
+  let metal=mat(0x60646a,.72,.04);
+  let wood=mat(0x8a6233,.78);
+
+  box(50,7.5,1.2,0,3.75,-25,wall,false);
+  box(50,7.5,1.2,0,3.75,25,wall,false);
+  box(1.2,7.5,50,-25,3.75,0,wall,false);
+  box(1.2,7.5,50,25,3.75,0,wall,false);
+
+  box(12,3.2,1,-9,1.6,-7,concrete,true);
+  box(1,3.2,12,9,1.6,-4,concrete,true);
+  box(9,3.2,1,9,1.6,9,concrete,true);
+  box(1,3.2,9,-12,1.6,9,concrete,true);
+
+  [
+    [7,1,4,-15,.5,1],
+    [6,1.8,4,-9,.9,2],
+    [5,2.6,4,-3,1.3,3],
+    [5,3.4,5,4,1.7,4],
+    [6,2.2,3,11,1.1,0],
+    [4,3,4,14,1.5,-7],
+    [5,2.4,5,-16,1.2,-14],
+    [4,3.2,4,0,1.6,-12],
+    [4,.55,3,-18,.275,9],
+    [4,1.05,3,-14,.525,9],
+    [4,1.55,3,-10,.775,9]
+  ].forEach(p=>box(...p,metal,true));
+
+  [
+    [-18,.9,-9],
+    [-14,.9,-6],
+    [-4,.9,-4],
+    [4,.9,-5],
+    [14,.9,7],
+    [-12,.9,14],
+    [-2,.9,13],
+    [9,.9,14]
+  ].forEach(p=>{
+    let c=box(1.8,1.8,1.8,...p,wood,true);
+    crates.push({mesh:c,vel:new THREE.Vector3()});
+  });
+}
+
+function gun(){
+  const g=new THREE.Group();
+  g.userData={flash:null,recoil:0,reload:0,switchT:0,mag:null,parts:[]};
+  camera.add(g);
+  scene.add(camera);
+  camera.userData.gun=g;
+  buildGun(cur);
+}
+
+function clearGun(){
+  const g=camera.userData.gun;
+  while(g.children.length)g.remove(g.children[0]);
+  g.userData.parts=[];
+  g.userData.mag=null;
+  g.userData.flash=null;
+}
+
+function addPart(g,geo,matr,pos,rot=[0,0,0]){
+  const m=new THREE.Mesh(geo,matr);
+  m.position.set(...pos);
+  m.rotation.set(...rot);
+  m.castShadow=true;
+  g.add(m);
+  g.userData.parts.push(m);
+  return m;
+}
+
+function buildGun(id){
+  const g=camera.userData.gun;
+  if(!g)return;
+
+  clearGun();
+
+  const black=mat(0x111214,.46,.45);
+  const dark=mat(0x050505,.38,.75);
+  const metal=mat(0x2b2e32,.42,.55);
+  const wood=mat(0x4b2e19,.72,.08);
+  const tan=mat(0x7b6544,.7,.08);
+
+  const boxG=(x,y,z)=>new THREE.BoxGeometry(x,y,z);
+  const cyl=(r,h,n=14)=>new THREE.CylinderGeometry(r,r,h,n);
+
+  if(id==='pistol'){
+    addPart(g,boxG(.30,.16,.72),metal,[.32,-.24,-.66]);
+    addPart(g,boxG(.26,.10,.54),dark,[.32,-.15,-.78]);
+    addPart(g,cyl(.032,.56),dark,[.32,-.15,-1.15],[Math.PI/2,0,0]);
+    addPart(g,boxG(.17,.34,.16),black,[.29,-.48,-.48],[-.22,0,0]);
+    g.userData.mag=addPart(g,boxG(.13,.27,.14),dark,[.29,-.59,-.52],[-.1,0,0]);
+  }
+
+  if(id==='shotgun'){
+    addPart(g,boxG(.25,.18,1.15),black,[.32,-.25,-.73]);
+    addPart(g,cyl(.045,1.15,16),dark,[.32,-.16,-1.25],[Math.PI/2,0,0]);
+    addPart(g,cyl(.038,.92,12),metal,[.32,-.27,-1.14],[Math.PI/2,0,0]);
+    addPart(g,boxG(.20,.42,.23),wood,[.25,-.52,-.48],[-.28,0,0]);
+    addPart(g,boxG(.22,.16,.42),wood,[.32,-.34,-1.08]);
+    g.userData.mag=null;
+  }
+
+  if(id==='rifle'){
+    addPart(g,boxG(.27,.18,.92),black,[.32,-.25,-.72]);
+    addPart(g,boxG(.30,.12,.66),metal,[.32,-.16,-.86]);
+    addPart(g,cyl(.033,.88,16),dark,[.32,-.16,-1.35],[Math.PI/2,0,0]);
+    addPart(g,boxG(.18,.36,.18),black,[.28,-.51,-.50],[-.24,0,0]);
+    g.userData.mag=addPart(g,boxG(.15,.42,.20),dark,[.30,-.61,-.72],[-.22,0,0]);
+    addPart(g,boxG(.13,.10,.28),dark,[.32,-.03,-.72]);
+  }
+
+  if(id==='lmg'){
+    addPart(g,boxG(.34,.22,1.05),metal,[.34,-.25,-.78]);
+    addPart(g,cyl(.04,1.12,16),dark,[.34,-.15,-1.42],[Math.PI/2,0,0]);
+    addPart(g,boxG(.32,.16,.55),dark,[.34,-.12,-.95]);
+    addPart(g,boxG(.20,.40,.20),black,[.27,-.53,-.55],[-.22,0,0]);
+    g.userData.mag=addPart(g,cyl(.22,.16,20),dark,[.34,-.55,-.78],[Math.PI/2,0,0]);
+    addPart(g,boxG(.22,.12,.48),tan,[.34,-.34,-1.10]);
+  }
+
+  if(id==='sniper'){
+    addPart(g,boxG(.25,.17,1.28),black,[.32,-.25,-.82]);
+    addPart(g,cyl(.035,1.45,18),dark,[.32,-.15,-1.58],[Math.PI/2,0,0]);
+    addPart(g,cyl(.09,.46,18),dark,[.32,-.03,-.84],[0,0,Math.PI/2]);
+    addPart(g,cyl(.055,.34,18),metal,[.32,-.03,-.57],[0,0,Math.PI/2]);
+    addPart(g,boxG(.18,.37,.18),black,[.26,-.52,-.50],[-.24,0,0]);
+    g.userData.mag=addPart(g,boxG(.14,.25,.18),dark,[.30,-.57,-.72],[-.15,0,0]);
+    addPart(g,boxG(.42,.09,.18),black,[.32,-.30,-.23]);
+  }
+
+  const flash=new THREE.PointLight(0xffd27a,0,3.6);
+  flash.position.set(.32,-.16,-1.58);
+  g.add(flash);
+  g.userData.flash=flash;
+
+  g.position.set(0,.04,.22);
+  g.rotation.set(.25,0,0);
+  g.userData.switchT=1;
+}
+
+function spawnTargets(){
+  [
+    [-12,0,-14],[-6,0,-17],[0,0,-15],[6,0,-17],[12,0,-14],
+    [-14,0,-4],[-7,0,-6],[7,0,-6],[14,0,-4],
+    [-8,0,7],[0,0,5],[8,0,7]
+  ].forEach(p=>{
+    let g=new THREE.Group();
+
+    let stand=new THREE.Mesh(new THREE.BoxGeometry(.12,1.4,.12),mat(0x222222,.7,.2));
+    stand.position.y=.7;
+    stand.castShadow=true;
+    g.add(stand);
+
+    let board=new THREE.Mesh(new THREE.BoxGeometry(1.15,1.15,.12),mat(0xd9d2bd,.75));
+    board.position.y=1.55;
+    board.castShadow=true;
+    board.userData.part='board';
+    g.add(board);
+
+    let r1=new THREE.Mesh(new THREE.TorusGeometry(.38,.035,8,40),new THREE.MeshBasicMaterial({color:0x111111}));
+    r1.position.set(0,1.55,-.07);
+    g.add(r1);
+
+    let r2=new THREE.Mesh(new THREE.TorusGeometry(.23,.035,8,40),new THREE.MeshBasicMaterial({color:0xcc2222}));
+    r2.position.set(0,1.55,-.08);
+    g.add(r2);
+
+    let bull=new THREE.Mesh(new THREE.CircleGeometry(.105,24),new THREE.MeshBasicMaterial({color:0xff3333}));
+    bull.position.set(0,1.55,-.09);
+    bull.userData.part='bull';
+    g.add(bull);
+
+    g.position.set(...p);
+    g.userData={hp:100,alive:true,bull};
+    scene.add(g);
+    targets.push(g);
+  });
+}
+
+function events(){
+  addEventListener('resize',()=>{
+    camera.aspect=innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);
+  });
+
+  addEventListener('keydown',e=>{
+    keys[e.code]=true;
+    if(e.code==='KeyR')reload();
+    if(e.code==='Digit1')switchWeapon('pistol');
+    if(e.code==='Digit2')switchWeapon('shotgun');
+    if(e.code==='Digit3')switchWeapon('rifle');
+    if(e.code==='Digit4')switchWeapon('lmg');
+    if(e.code==='Digit5')switchWeapon('sniper');
+  });
+
+  addEventListener('keyup',e=>keys[e.code]=false);
+
+  $('start').onclick=()=>{
+    $('start').style.display='none';
+    initAudio();
+    renderer.domElement.requestPointerLock?.();
+  };
+
+  document.addEventListener('mousemove',e=>{
+    if(document.pointerLockElement===renderer.domElement){
+      let s=aim?.00125:.00225;
+      yaw-=e.movementX*s;
+      pitch-=e.movementY*s;
+      pitch=Math.max(-1.35,Math.min(1.35,pitch));
     }
   });
-  
-  const source = audioCtx.createMediaStreamSource(stream);
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 512;
-  analyser.smoothingTimeConstant = 0.3;
-  source.connect(analyser);
+
+  document.addEventListener('mousedown',e=>{
+    initAudio();
+    if(e.button===0)fire=true;
+    if(e.button===2)setAim(true);
+  });
+
+  document.addEventListener('mouseup',e=>{
+    if(e.button===0)fire=false;
+    if(e.button===2)setAim(false);
+  });
+
+  document.addEventListener('contextmenu',e=>e.preventDefault());
+
+  document.addEventListener('wheel',e=>{
+    e.preventDefault();
+    cycleWeapon(e.deltaY>0?1:-1);
+  },{passive:false});
+
+  document.querySelectorAll('.w').forEach(b=>{
+    b.onclick=()=>switchWeapon(b.dataset.w);
+  });
 }
 
-function getVolume() {
-  const data = new Uint8Array(analyser.fftSize);
-  analyser.getByteTimeDomainData(data);
-  
-  let sum = 0;
-  for (let i = 0; i < data.length; i++) {
-    const v = (data[i] - 128) / 128;
-    sum += v * v;
-  }
-  return Math.sqrt(sum / data.length);
+function setAim(v){
+  aim=v;
+  document.body.classList.toggle('aim',v);
+  camera.fov=v?46:75;
+  camera.updateProjectionMatrix();
 }
 
-function detectLoop() {
-  if (!isRunning) return;
-  requestAnimationFrame(detectLoop);
-  
-  const rms = getVolume();
-  const now = Date.now();
-  const volPercent = Math.min(rms * 500, 100);
-  
-  volumeFill.style.width = volPercent + '%';
-  
-  // 根据当前阶段更新音效
-  if (currentPhase === 'inhale') {
-    const intensity = Math.max(0, (rms - CONFIG.threshold) / 0.5);
-    audioEngine.setInhaleVolume(intensity);
-  } else if (currentPhase === 'exhale') {
-    const intensity = Math.max(0, (rms - CONFIG.threshold) / 0.4);
-    audioEngine.setExhaleVolume(intensity);
-  } else {
-    audioEngine.stopAll();
-  }
-  
-  // 阶段超时检查
-  if (currentPhase !== 'idle') {
-    const phaseConfig = PHASE_CONFIG[currentPhase];
-    const phaseElapsed = now - lastStateTime;
-    
-    if (phaseElapsed > phaseConfig.maxTime) {
-      // 自动切换到下一阶段
-      switchPhase(currentPhase === 'inhale' ? 'pause' : 'idle', now);
+function groundAt(x,z){
+  let y=eye;
+  for(let b of boxes){
+    if(!b.stand)continue;
+    let p=b.mesh.position;
+    if(Math.abs(x-p.x)<b.w/2+player.r*.72 && Math.abs(z-p.z)<b.d/2+player.r*.72){
+      y=Math.max(y,b.top+eye);
     }
   }
-  
-  // 音量检测（只在pause或idle阶段响应新呼吸）
-  if (currentPhase === 'idle' || currentPhase === 'pause') {
-    if (rms > CONFIG.threshold) {
-      if (!isBreathing) {
-        isBreathing = true;
-        breathStartTime = now;
-        breathPeakVolume = rms;
-        breathStartVolume = rms;
-      } else {
-        if (rms > breathPeakVolume) {
-          breathPeakVolume = rms;
-        }
-        
-        const duration = now - breathStartTime;
-        
-        // 强制切换检查
-        if (duration > CONFIG.maxInhaleTime) {
-          switchPhase('exhale', now);
-        } else if (currentPhase === 'pause' && duration > 500) {
-          // 暂停期间持续吹气，转为吐气
-          switchPhase('exhale', now);
-        } else if (currentPhase === 'idle' && duration > CONFIG.exhaleMinTime) {
-          // 持续时间长 → 吐气
-          switchPhase('exhale', now);
-        } else if (currentPhase === 'idle' && duration > CONFIG.inhaleMaxTime && 
-                   breathPeakVolume > CONFIG.minVolume * 1.5) {
-          // 吹气强且时间长 → 吐气
-          switchPhase('exhale', now);
-        } else if (currentPhase === 'idle' && duration < CONFIG.inhaleMaxTime) {
-          // 短吹 → 吸气
-          switchPhase('inhale', now);
-        }
+  return y;
+}
+
+function movePlayer(dt){
+  let f=new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw));
+  let r=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+  let m=new THREE.Vector3();
+  let speed=(keys.ShiftLeft?7.1:5.1)*(aim?.62:1);
+
+  if(keys.KeyW)m.add(f.clone().multiplyScalar(-1));
+  if(keys.KeyS)m.add(f);
+  if(keys.KeyA)m.add(r.clone().multiplyScalar(-1));
+  if(keys.KeyD)m.add(r);
+
+  if(moveVec.x||moveVec.y){
+    m.add(r.clone().multiplyScalar(moveVec.x));
+    m.add(f.clone().multiplyScalar(moveVec.y));
+  }
+
+  if(m.length()>0)m.normalize().multiplyScalar(speed*dt);
+
+  player.pos.add(m);
+  collide();
+
+  if(keys.Space&&!keys._space&&jumpCount<2){
+    velY=jumpCount?5.6:6.4;
+    jumpCount++;
+    keys._space=true;
+    sfx('jump');
+  }
+
+  if(!keys.Space)keys._space=false;
+
+  velY-=18*dt;
+  player.pos.y+=velY*dt;
+
+  let gy=groundAt(player.pos.x,player.pos.z);
+  if(player.pos.y<=gy&&velY<=0){
+    player.pos.y=gy;
+    velY=0;
+    jumpCount=0;
+  }
+
+  let bob=(m.length()&&jumpCount===0)?Math.sin(performance.now()*.012)*.018:0;
+
+  camera.position.copy(player.pos);
+  camera.position.y+=bob;
+  camera.rotation.order='YXZ';
+  camera.rotation.y=yaw+shake*(Math.random()-.5);
+  camera.rotation.x=pitch+shake*(Math.random()-.5);
+  shake*=.82;
+
+  let g=camera.userData.gun;
+  if(g){
+    g.userData.recoil*=.7;
+    g.userData.switchT*=.78;
+
+    let base=aim?new THREE.Vector3(-.18,.05,-.15):new THREE.Vector3(0,0,0);
+
+    if(g.userData.reload){
+      base.y-=.18;
+      base.z+=.18;
+      g.rotation.z=Math.sin(performance.now()*.018)*.18;
+      if(g.userData.mag){
+        g.userData.mag.position.y=-.72+Math.sin(performance.now()*.012)*.10;
       }
-    } else {
-      if (isBreathing) {
-        // 呼吸结束
-        isBreathing = false;
-        
-        const duration = now - breathStartTime;
-        
-        if (currentPhase === 'inhale' && duration < CONFIG.maxInhaleTime) {
-          // 吸气结束，进入暂停
-          switchPhase('pause', now);
-        } else if (currentPhase === 'exhale' || currentPhase === 'pause') {
-          // 吐气结束
-          switchPhase('idle', now);
-        }
-        
-        breathStartTime = null;
-        breathPeakVolume = 0;
+    }else{
+      g.rotation.z*=.75;
+    }
+
+    g.position.lerp(base,.22);
+    g.position.y-=g.userData.switchT*.28;
+    g.position.z+=g.userData.recoil;
+    g.rotation.x=g.userData.recoil*1.8+g.userData.switchT*.35;
+  }
+}
+
+function collide(){
+  player.pos.x=Math.max(-23.75,Math.min(23.75,player.pos.x));
+  player.pos.z=Math.max(-23.75,Math.min(23.75,player.pos.z));
+
+  for(let b of boxes){
+    let p=b.mesh.position;
+    let hx=b.w/2+player.r;
+    let hz=b.d/2+player.r;
+    let top=b.top+eye;
+
+    if(player.pos.y>top+.12)continue;
+
+    if(
+      Math.abs(player.pos.x-p.x)<hx &&
+      Math.abs(player.pos.z-p.z)<hz &&
+      player.pos.y>p.y-b.h/2 &&
+      player.pos.y<top
+    ){
+      let dx=hx-Math.abs(player.pos.x-p.x);
+      let dz=hz-Math.abs(player.pos.z-p.z);
+
+      if(dx<dz)player.pos.x+=player.pos.x>p.x?dx:-dx;
+      else player.pos.z+=player.pos.z>p.z?dz:-dz;
+    }
+  }
+}
+
+function updateCrates(dt){
+  crates.forEach(c=>{
+    c.mesh.position.add(c.vel.clone().multiplyScalar(dt));
+    c.vel.multiplyScalar(.9);
+    c.mesh.rotation.x+=c.vel.z*dt*.35;
+    c.mesh.rotation.z-=c.vel.x*dt*.35;
+  });
+}
+
+function autoFire(){
+  let now=performance.now();
+  if(fire&&now>nextShot){
+    shoot();
+    nextShot=now+W[cur].delay;
+    if(!W[cur].auto)fire=false;
+  }
+}
+
+function shoot(){
+  if(reloading)return;
+
+  let w=W[cur];
+
+  if(ammo<=0){
+    sfx('empty');
+    nextShot=performance.now()+240;
+    return;
+  }
+
+  ammo--;
+  w.a=ammo;
+  updateHud();
+  sfx('shot');
+
+  let g=camera.userData.gun;
+  g.userData.recoil+=(aim?w.rec*.48:w.rec);
+  g.userData.flash.intensity=7;
+  setTimeout(()=>g.userData.flash.intensity=0,40);
+
+  pitch-=aim?w.rec*.055:w.rec*.095;
+  yaw+=(Math.random()-.5)*(aim?w.asp:w.sp)*.65;
+  shake=Math.max(shake,aim?.012:.022);
+
+  let objs=[];
+  targets.forEach(t=>{
+    if(t.userData.alive)t.children.forEach(o=>objs.push(o));
+  });
+  crates.forEach(c=>objs.push(c.mesh));
+
+  let did=false;
+
+  for(let i=0;i<w.pel;i++){
+    let sp=aim?w.asp:w.sp;
+    ray.setFromCamera(new THREE.Vector2((Math.random()-.5)*sp,(Math.random()-.5)*sp),camera);
+
+    let h=ray.intersectObjects(objs,false)[0];
+    if(!h)continue;
+
+    did=true;
+
+    let t=targets.find(x=>x.children.includes(h.object));
+
+    if(t){
+      let bull=h.object.userData.part==='bull';
+      t.userData.hp-=bull?Math.max(100,w.dmg*1.7):w.dmg;
+      spark(h.point,bull?0xff3030:0xffd080);
+
+      if(t.userData.hp<=0&&t.userData.alive){
+        t.userData.alive=false;
+        t.visible=false;
+        kills++;
+        updateHud();
+      }
+    }else{
+      let c=crates.find(x=>x.mesh===h.object);
+      if(c){
+        c.vel.add(ray.ray.direction.clone().multiplyScalar(cur==='shotgun'?9:6));
+        spark(h.point,0xf0c060);
       }
     }
   }
-  
-  // 更新深度显示
-  updateDepth();
-}
 
-function switchPhase(phase, time) {
-  currentPhase = phase;
-  lastStateTime = time;
-  
-  const config = PHASE_CONFIG[phase];
-  
-  // 更新UI
-  stateRing.className = `state-ring ${phase}`;
-  breathIcon.textContent = config.icon;
-  progressRing.style.stroke = config.color;
-  
-  // 重置进度条
-  progressRing.style.strokeDashoffset = 283;
-  
-  // 开始进度动画
-  if (phase !== 'idle') {
-    animateProgress(phase);
-  }
-  
-  // 调整音量
-  if (phase === 'idle' || phase === 'pause') {
-    audioEngine.stopAll();
+  if(did){
+    showHit();
+    sfx(cur==='sniper'?'head':'hit');
   }
 }
 
-function animateProgress(phase) {
-  const maxTime = PHASE_CONFIG[phase].maxTime;
-  const startTime = lastStateTime;
-  
-  function update() {
-    if (currentPhase !== phase) return;
-    
-    const elapsed = Date.now() - startTime;
-    const progress = Math.min(elapsed / maxTime, 1);
-    const offset = 283 * (1 - progress);
-    
-    progressRing.style.strokeDashoffset = offset;
-    
-    if (progress < 1 && isRunning) {
-      requestAnimationFrame(update);
+function reload(){
+  let w=W[cur];
+
+  if(reloading||ammo===w.mag||reserve<=0)return;
+
+  reloading=true;
+  fire=false;
+  sfx('reload');
+  $('ammo').textContent='RELOADING';
+
+  let g=camera.userData.gun;
+  if(g)g.userData.reload=1;
+
+  setTimeout(()=>{
+    let n=Math.min(w.mag-ammo,reserve);
+    ammo+=n;
+    reserve-=n;
+    w.a=ammo;
+    w.r=reserve;
+    reloading=false;
+    if(g)g.userData.reload=0;
+    updateHud();
+  },cur==='lmg'?1350:cur==='shotgun'?1150:cur==='sniper'?1250:950);
+}
+
+function switchWeapon(id){
+  if(!W[id]||id===cur||reloading)return;
+
+  W[cur].a=ammo;
+  W[cur].r=reserve;
+
+  cur=id;
+  ammo=W[cur].a;
+  reserve=W[cur].r;
+
+  document.querySelectorAll('.w').forEach(b=>b.classList.toggle('on',b.dataset.w===cur));
+
+  setAim(false);
+  buildGun(cur);
+  tone(260,.045,'triangle',.05);
+  updateHud();
+}
+
+function cycleWeapon(dir){
+  let i=order.indexOf(cur);
+  switchWeapon(order[(i+dir+order.length)%order.length]);
+}
+
+function showHit(){
+  hit.style.opacity=1;
+  hit.style.transform='translate(-50%,-50%) scale(1)';
+  setTimeout(()=>{
+    hit.style.opacity=0;
+    hit.style.transform='translate(-50%,-50%) scale(.25)';
+  },75);
+}
+
+function spark(p,c){
+  let s=new THREE.Mesh(new THREE.SphereGeometry(.055,8,8),new THREE.MeshBasicMaterial({color:c}));
+  s.position.copy(p);
+  scene.add(s);
+  setTimeout(()=>scene.remove(s),110);
+}
+
+function updateHud(){
+  $('ammo').textContent=`${W[cur].n} ${ammo} / ${reserve}`;
+  $('hp').textContent=`HP ${hp}`;
+  $('kill').textContent=kills;
+}
+
+function mobile(){
+  let mv=$('move');
+  let lk=$('look');
+  let fb=$('fire');
+  let ab=$('ads');
+  let rb=$('reload');
+
+  mv.addEventListener('touchstart',e=>{
+    moveTouch=e.changedTouches[0].identifier;
+  },{passive:false});
+
+  mv.addEventListener('touchmove',e=>{
+    for(let t of e.changedTouches){
+      if(t.identifier===moveTouch){
+        let r=mv.getBoundingClientRect();
+        moveVec.x=((t.clientX-r.left)/r.width-.5)*2;
+        moveVec.y=((t.clientY-r.top)/r.height-.5)*2;
+        moveVec.x=Math.max(-1,Math.min(1,moveVec.x));
+        moveVec.y=Math.max(-1,Math.min(1,moveVec.y));
+      }
     }
-  }
-  
-  update();
+    e.preventDefault();
+  },{passive:false});
+
+  mv.addEventListener('touchend',()=>{
+    moveVec={x:0,y:0};
+    moveTouch=null;
+  });
+
+  lk.addEventListener('touchstart',e=>{
+    lookTouch=e.changedTouches[0].identifier;
+    lastLook={x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY};
+  },{passive:false});
+
+  lk.addEventListener('touchmove',e=>{
+    for(let t of e.changedTouches){
+      if(t.identifier===lookTouch){
+        let s=aim?.0028:.005;
+        yaw-=(t.clientX-lastLook.x)*s;
+        pitch-=(t.clientY-lastLook.y)*s;
+        pitch=Math.max(-1.35,Math.min(1.35,pitch));
+        lastLook={x:t.clientX,y:t.clientY};
+      }
+    }
+    e.preventDefault();
+  },{passive:false});
+
+  lk.addEventListener('touchend',()=>lookTouch=null);
+
+  fb.addEventListener('touchstart',e=>{
+    initAudio();
+    fire=true;
+    e.preventDefault();
+  });
+
+  fb.addEventListener('touchend',()=>fire=false);
+
+  ab.addEventListener('touchstart',e=>{
+    setAim(true);
+    e.preventDefault();
+  });
+
+  ab.addEventListener('touchend',()=>setAim(false));
+
+  rb.addEventListener('touchstart',e=>{
+    reload();
+    e.preventDefault();
+  });
 }
 
-function updateDepth() {
-  // 根据状态计算虚拟深度
-  if (currentPhase === 'inhale') {
-    targetDepth = Math.min(targetDepth + 0.15, 30);
-  } else if (currentPhase === 'exhale') {
-    targetDepth = Math.max(targetDepth - 0.08, 0);
-  } else {
-    targetDepth = Math.max(targetDepth - 0.02, 0);
-  }
-  
-  currentDepth += (targetDepth - currentDepth) * 0.1;
-  depthValue.textContent = currentDepth.toFixed(1);
+function loop(){
+  requestAnimationFrame(loop);
+  let dt=Math.min(clock.getDelta(),.033);
+  autoFire();
+  movePlayer(dt);
+  updateCrates(dt);
+  renderer.render(scene,camera);
 }
-
-// 页面关闭时清理
-window.addEventListener('beforeunload', () => {
-  if (audioEngine) {
-    audioEngine.dispose();
-  }
-});
 </script>
 </body>
 </html>
