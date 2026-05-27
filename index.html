@@ -3,37 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>狼人杀抽卡</title>
+<title>GBA Joker Dice Flip</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:#070914;color:#fff;font-family:monospace;overflow:hidden}
-.app{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:12px;background:radial-gradient(circle at top,#26386b,#070914 65%)}
-.screen{width:100%;max-width:430px;min-height:700px;position:relative;overflow:hidden;background:#101832;border:5px solid #ffe27a;box-shadow:0 0 0 5px #000,0 0 24px #4d7cff;padding:20px}
+body{margin:0;background:#050714;color:#fff;font-family:monospace;overflow:hidden}
+.app{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:8px;background:radial-gradient(circle at top,#30447c,#070914 68%)}
+.screen{width:100%;max-width:470px;min-height:730px;position:relative;overflow:hidden;background:#101832;border:5px solid #ffe27a;box-shadow:0 0 0 5px #000,0 0 24px #4d7cff;padding:14px}
 .screen:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(255,255,255,.035) 51%);background-size:100% 6px;pointer-events:none}
-.bg-dot{position:absolute;width:4px;height:4px;background:#fff;opacity:.55}
-.moon{position:absolute;right:24px;top:28px;width:46px;height:46px;background:#ffeaa7;box-shadow:0 0 18px #ffeaa7}
-.hill{position:absolute;left:0;right:0;bottom:0;height:90px;background:linear-gradient(#18213d,#06070d);border-top:4px solid #29395f}
+.moon{position:absolute;right:22px;top:22px;width:42px;height:42px;background:#ffeaa7;box-shadow:0 0 18px #ffeaa7}
+.hill{position:absolute;left:0;right:0;bottom:0;height:78px;background:linear-gradient(#18213d,#06070d);border-top:4px solid #29395f}
+.dot{position:absolute;width:4px;height:4px;background:#fff;opacity:.55}
 .content{position:relative;z-index:2}
-.title{text-align:center;font-size:34px;font-weight:900;color:#ffe27a;letter-spacing:2px;text-shadow:3px 3px #000,5px 5px #5f3cff;margin:20px 0 6px}
-.sub{text-align:center;color:#9be7ff;margin-bottom:24px}
-.btn{width:100%;margin:11px 0;padding:16px;border:4px solid #fff;background:#283f7a;color:#fff;font-size:19px;font-weight:900;font-family:monospace;box-shadow:5px 5px #000;text-shadow:2px 2px #000}
-.btn:active{transform:translate(3px,3px);box-shadow:2px 2px #000}
-.gold{background:#a36a13;color:#fff3b0}.green{background:#17724e}.red{background:#8b2137}
-.panel{background:#0a1024;border:4px solid #fff;padding:14px;line-height:1.7;box-shadow:4px 4px #000;color:#dfe6ff}
-.card-zone{height:355px;display:flex;align-items:center;justify-content:center}
-.card{width:250px;height:335px;background:linear-gradient(150deg,#283764,#12192d);border:5px solid #fff;box-shadow:0 0 0 5px #000,0 0 20px #4d7cff;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;animation:float 1.7s ease-in-out infinite}
-.card:before{content:"";position:absolute;inset:13px;border:3px dashed #ffe27a}
-.card.reveal{animation:flip .45s ease, glow 1s alternate infinite}
-.q{font-size:100px;color:#ffe27a;text-shadow:6px 6px #000}
-.role{font-size:34px;font-weight:900;color:#ffe27a;text-shadow:4px 4px #000;margin-top:12px}
-.notice{text-align:center;margin-top:78px;font-size:24px;line-height:1.7;text-shadow:3px 3px #000}
-.hl{font-size:30px;color:#ffe27a}
-.footer{position:absolute;bottom:10px;left:0;width:100%;text-align:center;font-size:12px;color:#7d8fb9}
-.art{width:150px;height:150px;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);gap:2px;z-index:3}
+.title{text-align:center;font-size:27px;font-weight:900;color:#ffe27a;letter-spacing:1px;text-shadow:3px 3px #000,5px 5px #5f3cff;margin:8px 0 3px}
+.sub{text-align:center;color:#9be7ff;margin-bottom:10px;font-size:12px}
+.panel{background:#0a1024;border:4px solid #fff;padding:10px;line-height:1.45;box-shadow:4px 4px #000;color:#dfe6ff}
+.row{display:flex;gap:8px;margin:9px 0}
+.btn{flex:1;padding:12px 8px;border:4px solid #fff;background:#283f7a;color:#fff;font-size:15px;font-weight:900;font-family:monospace;box-shadow:4px 4px #000;text-shadow:2px 2px #000}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
+.btn:disabled{opacity:.45;filter:grayscale(1)}
+.gold{background:#a36a13;color:#fff3b0}.red{background:#8b2137}.green{background:#17724e}
+.status{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:7px 0;font-size:13px;text-align:center}
+.box{border:3px solid #fff;background:#0a1024;padding:6px;box-shadow:3px 3px #000}
+.turn{color:#ffe27a;font-size:18px;text-shadow:2px 2px #000}
+.dice{font-size:34px;color:#ffe27a;text-shadow:3px 3px #000}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
+.card{height:88px;background:linear-gradient(150deg,#283764,#12192d);border:4px solid #fff;box-shadow:0 0 0 3px #000,0 0 10px #4d7cff;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card:before{content:"";position:absolute;inset:7px;border:2px dashed #ffe27a}
+.card.open{background:linear-gradient(150deg,#f7f0d8,#d8cda8);animation:flip .28s ease}
+.card.joker{background:linear-gradient(150deg,#6b1024,#18050b);box-shadow:0 0 0 3px #000,0 0 20px #ff3860}
+.back{font-size:36px;color:#ffe27a;text-shadow:4px 4px #000;z-index:2}
+.rank{font-size:32px;font-weight:900;color:#18213d;text-shadow:2px 2px #fff;z-index:4}
+.suit{position:absolute;right:7px;bottom:5px;font-size:21px;color:#18213d;z-index:4}
+.corner{position:absolute;left:7px;top:5px;font-size:13px;color:#18213d;font-weight:900;z-index:4}
+.redSuit .rank,.redSuit .suit,.redSuit .corner{color:#b81735}
+.joker .rank{font-size:22px;color:#ffe27a;text-shadow:3px 3px #000}
+.joker .suit,.joker .corner{color:#ff94aa}
+.face{position:absolute;width:46px;height:46px;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);gap:1px;z-index:3;opacity:.92}
 .p{background:var(--c)}
-@keyframes float{50%{transform:translateY(-9px)}}
-@keyframes flip{0%{transform:rotateY(90deg) scale(.9)}100%{transform:rotateY(0) scale(1)}}
-@keyframes glow{to{box-shadow:0 0 0 5px #000,0 0 32px #ffe27a}}
+.msg{text-align:center;margin-top:9px;font-size:18px;line-height:1.35;color:#ffe27a;text-shadow:3px 3px #000;min-height:50px}
+.footer{position:absolute;bottom:7px;left:0;width:100%;text-align:center;font-size:10px;color:#7d8fb9}
+@keyframes flip{0%{transform:rotateY(90deg) scale(.92)}100%{transform:rotateY(0) scale(1)}}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.shake{animation:shake .22s infinite}
 </style>
 </head>
 <body>
@@ -41,129 +52,162 @@ body{margin:0;background:#070914;color:#fff;font-family:monospace;overflow:hidde
 
 <script>
 const screen=document.getElementById("screen");
-const cfg={
-  3:["狼人","预言家","平民"],
-  4:["狼人","预言家","平民","平民"],
-  5:["狼人","预言家","女巫","平民","平民"],
-  6:["狼人","狼人","预言家","女巫","猎人","平民"]
-};
-const info={
-  狼人:["狼人阵营","隐藏身份，淘汰好人。"],
-  预言家:["好人阵营","每晚查验一名玩家。"],
-  女巫:["好人阵营","拥有解药和毒药。"],
-  猎人:["好人阵营","出局时可带走一人。"],
-  平民:["好人阵营","没有技能，靠推理找狼人。"]
-};
-let players=[],i=0,ctx=null,lastSound=0;
+let deck=[],turn=1,phase="home",jokerCount=3,dice=0,mustOpen=0,openedThisTurn=0,gameOver=false;
+let ctx=null,lastSound=0;
+const ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const suits=["♠","♥","♣","♦"];
+
+function bg(){
+ let h='<div class="moon"></div><div class="hill"></div>';
+ [[8,16],[18,9],[28,22],[42,13],[57,19],[70,11],[83,23],[91,15],[12,42],[35,35],[64,38],[78,47],[23,58],[52,55],[88,62]].forEach(d=>h+=`<i class="dot" style="left:${d[0]}%;top:${d[1]}%"></i>`);
+ return h+'<div class="content">';
+}
+function end(){return '</div><div class="footer">GBA PIXEL DICE CARD GAME</div>'}
 
 function sfx(type){
-  const now=Date.now();
-  if(now-lastSound<90)return;
-  lastSound=now;
-  ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
-  const seq={
-    click:[520,700],
-    shuffle:[260,330,420,520],
-    good:[660,880,1040],
-    wolf:[160,100],
-    done:[520,660,780,1040]
-  }[type]||[440];
-  seq.forEach((f,n)=>setTimeout(()=>{
-    const o=ctx.createOscillator(),g=ctx.createGain();
-    o.type=type==="wolf"?"sawtooth":"square";
-    o.frequency.value=f;
-    g.gain.value=.06;
-    o.connect(g);g.connect(ctx.destination);
-    o.start();
-    g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.08);
-    o.stop(ctx.currentTime+.09);
-  },n*70));
+ const now=Date.now(); if(now-lastSound<55)return; lastSound=now;
+ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+ const seq={
+  roll:[260,360,460,580,720],
+  normal:[620,820],
+  joker:[180,120,80],
+  click:[480,620],
+  start:[300,420,560,740],
+  finish:[520,660,780,1040,1240],
+  next:[420,520,620]
+ }[type]||[440];
+ seq.forEach((f,i)=>setTimeout(()=>{
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type==="joker"?"sawtooth":"square";
+  o.frequency.value=f;
+  g.gain.value=type==="joker"?.08:.052;
+  o.connect(g);g.connect(ctx.destination);o.start();
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.1);
+  o.stop(ctx.currentTime+.11);
+ },i*65));
 }
-function bg(){
-  let h='<div class="moon"></div><div class="hill"></div>';
-  const dots=[[8,16],[18,9],[28,22],[42,13],[57,19],[70,11],[83,23],[91,15],[12,42],[35,35],[64,38],[78,47],[23,58],[52,55],[88,62]];
-  dots.forEach(d=>h+=`<i class="bg-dot" style="left:${d[0]}%;top:${d[1]}%"></i>`);
-  return h+'<div class="content">';
-}
-function end(){return '</div><div class="footer">GBA STYLE ROLE DRAW</div>'}
-function shuf(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
 
-function art(role){
-  const colors={
-    狼人:["#2d3436","#636e72","#ff4757"],
-    预言家:["#6c5ce7","#74b9ff","#ffe27a"],
-    女巫:["#2d3436","#8e44ad","#00cec9"],
-    猎人:["#6ab04c","#8b5a2b","#ffe27a"],
-    平民:["#f1c27d","#0984e3","#ffbe76"]
-  }[role];
-  const maps={
-    狼人:"01000010 11111111 12211221 11122111 01111110 00111100 01100110 11000011",
-    预言家:"00111100 01122110 01222210 01233210 01122110 00111100 33333333 03333330",
-    女巫:"00111100 11111111 00011000 01111110 01222210 01233210 01111110 00111100",
-    猎人:"00111100 01111110 02222220 02233220 02222220 30100103 30000003 03000030",
-    平民:"00111100 01111110 01133110 00111100 02222220 02222220 10200201 10000001"
-  }[role].split(" ").join("");
-  return `<div class="art">${[...maps].map(v=>v==="0"?'<b></b>':`<b class="p" style="--c:${colors[v-1]}"></b>`).join("")}</div>`;
+function shuffle(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
+
+function face(type){
+ const data={
+  J:["#18213d","#ffe27a","#b81735","001100011110112211122211032230003300"],
+  Q:["#18213d","#ff9ff3","#ffe27a","001100011110122221123321012210003300"],
+  K:["#18213d","#ffe27a","#4d7cff","001100011110133331122221012210003300"],
+  Joker:["#ff3860","#fff","#2d3436","100001110011012210012210001100011110"]
+ }[type];
+ if(!data)return "";
+ return `<div class="face">${[...data[1]].map(v=>v==="0"?'<b></b>':`<b class="p" style="--c:${data[0][v-1]}"></b>`).join("")}</div>`;
+}
+
+function cardHTML(c,i){
+ if(!c.open)return `<div class="card" onclick="flip(${i})"><div class="back">?</div></div>`;
+ const red=c.suit==="♥"||c.suit==="♦";
+ const joker=c.type==="joker";
+ return `<div class="card open ${joker?'joker':''} ${red?'redSuit':''}">
+  <div class="corner">${joker?'JK':c.rank}</div>
+  ${joker?face("Joker"):face(c.rank)}
+  <div class="rank">${joker?'JOKER':c.rank}</div>
+  <div class="suit">${joker?'★':c.suit}</div>
+ </div>`;
 }
 
 function home(){
-  screen.innerHTML=bg()+`
-  <div class="title">狼人杀抽卡</div>
-  <div class="sub">PIXEL PARTY GAME</div>
-  <button class="btn gold" onclick="start(3)">3 人局</button>
-  <button class="btn gold" onclick="start(4)">4 人局</button>
-  <button class="btn gold" onclick="start(5)">5 人局</button>
-  <button class="btn gold" onclick="start(6)">6 人局</button>
-  <div class="panel">选择人数后自动洗牌。每位玩家依次看身份，中间有安全传手机界面。</div>
-  `+end();
+ phase="home";
+ screen.innerHTML=bg()+`
+ <div class="title">JOKER 骰子翻牌</div>
+ <div class="sub">4 × 5 GBA PIXEL CARD GAME</div>
+ <div class="panel">双人轮流。先摇骰子，摇到几就必须开几张牌。开到 Joker 播放失败音效但继续，全部 Joker 开完才结束。</div>
+ <div class="row"><button class="btn gold" onclick="setJoker(1)">1 Joker</button><button class="btn gold" onclick="setJoker(2)">2 Joker</button></div>
+ <div class="row"><button class="btn gold" onclick="setJoker(3)">3 Joker</button><button class="btn gold" onclick="setJoker(4)">4 Joker</button></div>
+ <button class="btn green" onclick="start()">开始游戏</button>
+ <div class="panel">当前 Joker 数量：<b style="color:#ffe27a">${jokerCount}</b></div>
+ `+end();
+}
+function setJoker(n){jokerCount=n;sfx("click");home()}
+
+function start(){
+ sfx("start");
+ let pool=[];
+ suits.forEach(s=>ranks.forEach(r=>pool.push({type:"normal",rank:r,suit:s,open:false})));
+ pool=shuffle(pool).slice(0,20-jokerCount);
+ for(let i=0;i<jokerCount;i++)pool.push({type:"joker",rank:"JOKER",suit:"★",open:false});
+ deck=shuffle(pool);
+ turn=1;dice=0;mustOpen=0;openedThisTurn=0;gameOver=false;phase="roll";
+ draw("玩家 1 请摇骰子");
 }
 
-function start(n){
-  sfx("shuffle");
-  players=shuf(cfg[n]).map((r,k)=>({name:`玩家 ${k+1}`,role:r}));
-  i=0;
-  setTimeout(safe,260);
+function rollDice(){
+ if(phase!=="roll"||gameOver)return;
+ sfx("roll");
+ phase="rolling";
+ dice=1+Math.floor(Math.random()*6);
+ setTimeout(()=>{
+  const left=deck.filter(c=>!c.open).length;
+  mustOpen=Math.min(dice,left);
+  openedThisTurn=0;
+  phase="open";
+  draw(`玩家 ${turn} 摇到 ${dice}<br>请打开 ${mustOpen} 张牌`);
+ },420);
+ draw("骰子滚动中...");
 }
-function safe(){
-  screen.innerHTML=bg()+`
-  <div class="notice">请把手机交给<br><span class="hl">${players[i].name}</span></div>
-  <div class="card-zone"><div class="card"><div class="q">?</div></div></div>
-  <button class="btn green" onclick="reveal()">我是 ${players[i].name}，查看身份</button>
-  `+end();
+
+function draw(msg=""){
+ const opened=deck.filter(c=>c.open).length;
+ const jokerOpened=deck.filter(c=>c.type==="joker"&&c.open).length;
+ screen.innerHTML=bg()+`
+ <div class="title">JOKER 骰子翻牌</div>
+ <div class="status">
+  <div class="box">玩家<br><span class="turn">${turn}</span></div>
+  <div class="box">骰子<br><span class="dice ${phase==='rolling'?'shake':''}">${phase==='rolling'?'?':(dice||'-')}</span></div>
+  <div class="box">Joker<br>${jokerOpened}/${jokerCount}</div>
+ </div>
+ <div class="status">
+  <div class="box">已开<br>${opened}/20</div>
+  <div class="box">本轮<br>${openedThisTurn}/${mustOpen||'-'}</div>
+  <div class="box">阶段<br>${phase==="roll"?"摇骰":phase==="open"?"开牌":phase==="rolling"?"滚动":"结束"}</div>
+ </div>
+ <button class="btn green" onclick="rollDice()" ${phase==="roll"&&!gameOver?"":"disabled"}>玩家 ${turn} 摇骰子</button>
+ <div class="grid">${deck.map(cardHTML).join("")}</div>
+ <div class="msg">${msg}</div>
+ <div class="row"><button class="btn red" onclick="home()">重设</button><button class="btn gold" onclick="start()">重开</button></div>
+ `+end();
 }
-function reveal(){
-  const p=players[i],d=info[p.role];
-  sfx(p.role==="狼人"?"wolf":"good");
-  screen.innerHTML=bg()+`
-  <div class="title">${p.name}</div>
-  <div class="card-zone"><div class="card reveal">${art(p.role)}<div class="role">${p.role}</div></div></div>
-  <div class="panel">阵营：${d[0]}<br>目标：${d[1]}</div>
-  <button class="btn red" onclick="next()">我已记住，隐藏身份</button>
-  `+end();
+
+function flip(i){
+ if(gameOver||phase!=="open"||deck[i].open)return;
+ deck[i].open=true;
+ openedThisTurn++;
+
+ let msg="";
+ if(deck[i].type==="joker"){
+  sfx("joker");
+  msg=`玩家 ${turn} 开到 JOKER<br>本轮继续开牌`;
+ }else{
+  sfx("normal");
+  msg=`普通牌<br>继续开牌`;
+ }
+
+ const jokerOpened=deck.filter(c=>c.type==="joker"&&c.open).length;
+ if(jokerOpened>=jokerCount){
+  gameOver=true; phase="end";
+  setTimeout(()=>sfx("finish"),220);
+  draw(`全部 Joker 已开完<br>游戏结束`);
+  return;
+ }
+
+ if(openedThisTurn>=mustOpen){
+  const old=turn;
+  turn=turn===1?2:1;
+  dice=0;mustOpen=0;openedThisTurn=0;phase="roll";
+  sfx("next");
+  draw(`玩家 ${old} 回合结束<br>轮到玩家 ${turn} 摇骰子`);
+  return;
+ }
+
+ draw(msg+`<br>还要开 ${mustOpen-openedThisTurn} 张`);
 }
-function next(){
-  sfx("click");
-  i++;
-  i>=players.length?done():safe();
-}
-function done(){
-  sfx("done");
-  screen.innerHTML=bg()+`
-  <div class="title">抽卡完成</div>
-  <div class="notice">所有玩家已确认身份<br><span class="hl">游戏开始</span></div>
-  <div class="card-zone"><div class="card reveal"><div class="role">START</div></div></div>
-  <button class="btn gold" onclick="home()">重新洗牌</button>
-  <button class="btn" onclick="showAll()">查看身份总表</button>
-  `+end();
-}
-function showAll(){
-  sfx("click");
-  screen.innerHTML=bg()+`
-  <div class="title">身份总表</div>
-  <div class="panel" style="font-size:21px">${players.map(p=>p.name+"："+p.role).join("<br>")}</div>
-  <button class="btn gold" onclick="home()">重新开始</button>
-  `+end();
-}
+
 home();
 </script>
 </body>
