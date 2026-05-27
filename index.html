@@ -2,63 +2,56 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>PIXEL DICE FLIP</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:#050714;color:#fff;font-family:monospace;overflow:hidden}
-.app{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:8px;background:radial-gradient(circle at top,#314984,#060817 70%)}
-.screen{width:100%;max-width:470px;min-height:730px;position:relative;overflow:hidden;background:#101832;border:5px solid #ffe27a;box-shadow:0 0 0 5px #000,0 0 26px #4d7cff;padding:14px}
+html,body{margin:0;background:#050714;color:#fff;font-family:monospace;overflow:auto}
+.app{min-height:100dvh;display:flex;justify-content:center;align-items:flex-start;padding:calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 90px);background:radial-gradient(circle at top,#314984,#050714 72%)}
+.screen{width:100%;max-width:470px;position:relative;overflow:hidden;background:#101832;border:5px solid #ffe27a;box-shadow:0 0 0 5px #000,0 0 28px #4d7cff;padding:12px}
 .screen:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(255,255,255,.035) 51%);background-size:100% 6px;pointer-events:none}
-.moon{position:absolute;right:22px;top:22px;width:42px;height:42px;background:#ffeaa7;box-shadow:0 0 18px #ffeaa7}
-.hill{position:absolute;left:0;right:0;bottom:0;height:78px;background:linear-gradient(#18213d,#06070d);border-top:4px solid #29395f}
-.dot{position:absolute;width:4px;height:4px;background:#fff;opacity:.55}
+.bgstar{position:absolute;width:4px;height:4px;background:#fff;opacity:.5}
+.bgmoon{position:absolute;right:18px;top:18px;width:42px;height:42px;background:#ffeaa7;box-shadow:0 0 18px #ffeaa7}
 .content{position:relative;z-index:2}
-.title{text-align:center;font-size:30px;font-weight:900;color:#ffe27a;text-shadow:3px 3px #000,5px 5px #5f3cff;margin:8px 0 8px}
-.row{display:flex;gap:8px;margin:9px 0}
-.btn{flex:1;padding:13px 8px;border:4px solid #fff;background:#283f7a;color:#fff;font-size:18px;font-weight:900;font-family:monospace;box-shadow:4px 4px #000;text-shadow:2px 2px #000}
+.title{text-align:center;font-size:28px;font-weight:900;color:#ffe27a;text-shadow:3px 3px #000,5px 5px #5f3cff;margin:4px 0 10px;letter-spacing:2px}
+.hud{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:7px;margin-bottom:8px}
+.box{border:3px solid #fff;background:#091024;padding:7px;text-align:center;box-shadow:3px 3px #000;color:#9be7ff}
+.big{font-size:23px;color:#ffe27a;text-shadow:3px 3px #000}
+.row{display:flex;gap:8px;margin-top:8px}
+.btn{flex:1;padding:11px 6px;border:4px solid #fff;background:#283f7a;color:#fff;font-size:16px;font-weight:900;font-family:monospace;box-shadow:4px 4px #000;text-shadow:2px 2px #000}
 .btn:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
-.btn:disabled{opacity:.35;filter:grayscale(1)}
 .gold{background:#a36a13;color:#fff3b0}.red{background:#8b2137}.green{background:#17724e}
-.hud{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:7px;margin:7px 0;text-align:center}
-.box{border:3px solid #fff;background:#0a1024;padding:7px;box-shadow:3px 3px #000;font-size:14px;color:#9be7ff}
-.big{font-size:24px;color:#ffe27a;text-shadow:3px 3px #000}
-.diceBox{height:92px;display:flex;align-items:center;justify-content:center;perspective:500px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.card{height:80px;position:relative;border:3px solid #fff;border-radius:5px;box-shadow:0 0 0 3px #000,0 0 10px #4d7cff;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#172345}
+.card.back:after{content:"";position:absolute;inset:7px;border:2px dashed #ffe27a}
+.card.open{background:linear-gradient(145deg,#fff9df,#d8cda8);animation:flip .22s ease}
+.card.joker{background:linear-gradient(145deg,#750b28,#1b0710);box-shadow:0 0 0 3px #000,0 0 22px #ff3860}
+.backmark{font-size:34px;color:#ffe27a;text-shadow:4px 4px #000;z-index:2}
+.corner{position:absolute;left:5px;top:4px;font-size:11px;font-weight:900;color:#101832;line-height:1}
+.corner2{position:absolute;right:5px;bottom:4px;font-size:11px;font-weight:900;color:#101832;line-height:1;transform:rotate(180deg)}
+.rank{font-size:27px;font-weight:900;color:#101832;text-shadow:2px 2px #fff;z-index:3}
+.redSuit .rank,.redSuit .corner,.redSuit .corner2,.redSuit .pip{color:#c1173c}
+.joker .rank{font-size:18px;color:#ffe27a;text-shadow:3px 3px #000}
+.joker .corner,.joker .corner2{color:#ff95b0}
+.faceArt{position:absolute;width:42px;height:42px;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);gap:1px;opacity:.9}
+.px{background:var(--c)}
+.pip{position:absolute;font-size:15px;color:#101832;font-weight:900}
+.p1{top:18px;left:50%;transform:translateX(-50%)}
+.p2{top:34px;left:50%;transform:translateX(-50%)}
+.p3{top:50px;left:50%;transform:translateX(-50%)}
+.msg{text-align:center;margin:8px 0 2px;font-size:30px;color:#ffe27a;text-shadow:4px 4px #000;min-height:36px}
+.diceBox{height:82px;display:flex;justify-content:center;align-items:center;perspective:500px}
+.diceActive{cursor:pointer;animation:diceGlow 1s infinite alternate}
 .dice3d{width:52px;height:52px;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.15,1.2,.3,1)}
 .roll{animation:spin .45s steps(8,end) infinite}
 .face3d{position:absolute;width:52px;height:52px;background:#f8f0d0;border:4px solid #111;box-shadow:inset -6px -6px #b8a56e,inset 4px 4px #fff}
-.f1{transform:rotateX(90deg) translateZ(26px)}
-.f2{transform:translateZ(26px)}
-.f3{transform:rotateY(90deg) translateZ(26px)}
-.f4{transform:rotateY(-90deg) translateZ(26px)}
-.f5{transform:rotateY(180deg) translateZ(26px)}
-.f6{transform:rotateX(-90deg) translateZ(26px)}
-.show1{transform:rotateX(-90deg) rotateZ(0)}
-.show2{transform:rotateX(0) rotateY(0)}
-.show3{transform:rotateY(-90deg)}
-.show4{transform:rotateY(90deg)}
-.show5{transform:rotateY(180deg)}
-.show6{transform:rotateX(90deg)}
-.pip{position:absolute;width:8px;height:8px;background:#111;border-radius:1px}
+.f1{transform:rotateX(90deg) translateZ(26px)}.f2{transform:translateZ(26px)}.f3{transform:rotateY(90deg) translateZ(26px)}.f4{transform:rotateY(-90deg) translateZ(26px)}.f5{transform:rotateY(180deg) translateZ(26px)}.f6{transform:rotateX(-90deg) translateZ(26px)}
+.show1{transform:rotateX(-90deg)}.show2{transform:rotateX(0)}.show3{transform:rotateY(-90deg)}.show4{transform:rotateY(90deg)}.show5{transform:rotateY(180deg)}.show6{transform:rotateX(90deg)}
+.dp{position:absolute;width:8px;height:8px;background:#111;border-radius:1px}
 .c{left:18px;top:18px}.tl{left:9px;top:9px}.tr{right:9px;top:9px}.bl{left:9px;bottom:9px}.br{right:9px;bottom:9px}.ml{left:9px;top:18px}.mr{right:9px;top:18px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
-.card{height:88px;background:linear-gradient(150deg,#283764,#12192d);border:4px solid #fff;box-shadow:0 0 0 3px #000,0 0 10px #4d7cff;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.card:before{content:"";position:absolute;inset:7px;border:2px dashed #ffe27a}
-.card.open{background:linear-gradient(150deg,#f7f0d8,#d8cda8);animation:flip .25s ease}
-.card.joker{background:linear-gradient(150deg,#6b1024,#18050b);box-shadow:0 0 0 3px #000,0 0 22px #ff3860}
-.backmark{font-size:36px;color:#ffe27a;text-shadow:4px 4px #000;z-index:2}
-.rank{font-size:32px;font-weight:900;color:#18213d;text-shadow:2px 2px #fff;z-index:4}
-.suit{position:absolute;right:7px;bottom:5px;font-size:21px;color:#18213d;z-index:4}
-.corner{position:absolute;left:7px;top:5px;font-size:13px;color:#18213d;font-weight:900;z-index:4}
-.redSuit .rank,.redSuit .suit,.redSuit .corner{color:#b81735}
-.joker .rank{font-size:21px;color:#ffe27a;text-shadow:3px 3px #000}
-.joker .suit,.joker .corner{color:#ff94aa}
-.face{position:absolute;width:46px;height:46px;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);gap:1px;z-index:3;opacity:.92}
-.p{background:var(--c)}
-.msg{text-align:center;margin-top:10px;font-size:30px;color:#ffe27a;text-shadow:4px 4px #000;min-height:42px}
-.footer{position:absolute;bottom:7px;left:0;width:100%;text-align:center;font-size:10px;color:#7d8fb9}
 @keyframes flip{0%{transform:rotateY(90deg) scale(.92)}100%{transform:rotateY(0) scale(1)}}
 @keyframes spin{to{transform:rotateX(520deg) rotateY(680deg) rotateZ(180deg)}}
+@keyframes diceGlow{from{filter:drop-shadow(0 0 2px #ffe27a);transform:scale(1)}to{filter:drop-shadow(0 0 8px #ffe27a) drop-shadow(0 0 16px #4d7cff);transform:scale(1.04)}}
 </style>
 </head>
 <body>
@@ -66,76 +59,103 @@ body{margin:0;background:#050714;color:#fff;font-family:monospace;overflow:hidde
 
 <script>
 const screen=document.getElementById("screen");
-let deck=[],turn=1,phase="home",jokerCount=3,dice=1,mustOpen=0,openedThisTurn=0,gameOver=false;
+let deck=[],turn=1,phase="home",jokerCount=4,dice=1,mustOpen=0,openedThisTurn=0,gameOver=false;
 let ctx=null,lastSound=0;
-const ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"],suits=["♠","♥","♣","♦"];
+const suits=["♠","♥","♦","♣"];
+const rankOrder=["A","K","Q","J","10","9","8","7","6","5","4","3","2"];
 
 function bg(){
- let h='<div class="moon"></div><div class="hill"></div>';
- [[8,16],[18,9],[28,22],[42,13],[57,19],[70,11],[83,23],[91,15],[12,42],[35,35],[64,38],[78,47],[23,58],[52,55],[88,62]].forEach(d=>h+=`<i class="dot" style="left:${d[0]}%;top:${d[1]}%"></i>`);
+ let h='<div class="bgmoon"></div>';
+ [[8,16],[18,9],[28,22],[42,13],[57,19],[70,11],[83,23],[91,15],[12,42],[35,35],[64,38],[78,47],[23,58],[52,55],[88,62]].forEach(d=>h+=`<i class="bgstar" style="left:${d[0]}%;top:${d[1]}%"></i>`);
  return h+'<div class="content">';
 }
-function end(){return '</div><div class="footer">GBA PIXEL DICE FLIP</div>'}
-function ac(){ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();return ctx}
+function end(){return '</div>'}
+function ac(){ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();return ctx}
 function tone(f,t=.08,type="square",gain=.05){const c=ac(),o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=f;g.gain.value=gain;o.connect(g);g.connect(c.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t);o.stop(c.currentTime+t+.01)}
 function kick(){const c=ac(),o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(120,c.currentTime);o.frequency.exponentialRampToValueAtTime(38,c.currentTime+.16);g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.18);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.2)}
 function sfx(type){
- const now=Date.now();if(now-lastSound<40)return;lastSound=now;
+ const now=Date.now(); if(now-lastSound<40)return; lastSound=now;
  if(type==="roll"){kick();[260,360,460,580,720].forEach((f,i)=>setTimeout(()=>tone(f,.05,"square",.045),i*55));return}
  if(type==="joker"){kick();[180,120,80].forEach((f,i)=>setTimeout(()=>tone(f,.1,"sawtooth",.075),i*85));return}
  const seq={normal:[620,820],click:[480,620],start:[300,420,560,740],finish:[520,660,780,1040,1240],next:[420,520,620]}[type]||[440];
  seq.forEach((f,i)=>setTimeout(()=>tone(f,.08,"square",.05),i*65));
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
-function pipHTML(n){return ({1:["c"],2:["tl","br"],3:["tl","c","br"],4:["tl","tr","bl","br"],5:["tl","tr","c","bl","br"],6:["tl","tr","ml","mr","bl","br"]}[n]).map(x=>`<i class="pip ${x}"></i>`).join("")}
-function diceHTML(){return `<div class="diceBox"><div class="dice3d ${phase==='rolling'?'roll':'show'+dice}">
+function pipHTML(n){return({1:["c"],2:["tl","br"],3:["tl","c","br"],4:["tl","tr","bl","br"],5:["tl","tr","c","bl","br"],6:["tl","tr","ml","mr","bl","br"]}[n]).map(x=>`<i class="dp ${x}"></i>`).join("")}
+function diceHTML(){
+return `<div class="diceBox ${phase==='roll'&&!gameOver?'diceActive':''}" onclick="rollDice()">
+<div class="dice3d ${phase==='rolling'?'roll':'show'+dice}">
 <div class="face3d f1">${pipHTML(1)}</div><div class="face3d f2">${pipHTML(2)}</div><div class="face3d f3">${pipHTML(3)}</div>
 <div class="face3d f4">${pipHTML(4)}</div><div class="face3d f5">${pipHTML(5)}</div><div class="face3d f6">${pipHTML(6)}</div>
-</div></div>`}
-function face(type){
- const data={J:["#18213d","#ffe27a","#b81735","001100011110112211122211032230003300"],Q:["#18213d","#ff9ff3","#ffe27a","001100011110122221123321012210003300"],K:["#18213d","#ffe27a","#4d7cff","001100011110133331122221012210003300"],Joker:["#ff3860","#fff","#2d3436","100001110011012210012210001100011110"]}[type];
- if(!data)return "";
- return `<div class="face">${[...data[1]].map(v=>v==="0"?'<b></b>':`<b class="p" style="--c:${data[0][v-1]}"></b>`).join("")}</div>`;
+</div></div>`;
+}
+function faceArt(rank){
+ const map={J:"001100011110112211122211032230003300",Q:"001100011110122221123321012210003300",K:"001100011110133331122221012210003300"}[rank];
+ if(!map)return "";
+ const colors={J:["#101832","#ffe27a","#c1173c"],Q:["#101832","#ff9ff3","#ffe27a"],K:["#101832","#ffe27a","#4d7cff"]}[rank];
+ return `<div class="faceArt">${[...map].map(v=>v==="0"?'<b></b>':`<b class="px" style="--c:${colors[v-1]}"></b>`).join("")}</div>`;
+}
+function pips(rank,suit){
+ if(["A","K","Q","J"].includes(rank))return `<span class="pip p2">${suit}</span>`;
+ let n=parseInt(rank);
+ if(n>=10)return `<span class="pip p1">${suit}</span><span class="pip p2">${suit}</span><span class="pip p3">${suit}</span>`;
+ if(n>=7)return `<span class="pip p1">${suit}</span><span class="pip p3">${suit}</span>`;
+ return `<span class="pip p2">${suit}</span>`;
 }
 function cardHTML(c,i){
- if(!c.open)return `<div class="card" onclick="flip(${i})"><div class="backmark">?</div></div>`;
+ if(!c.open)return `<div class="card back" onclick="flip(${i})"><div class="backmark">?</div></div>`;
  const red=c.suit==="♥"||c.suit==="♦",joker=c.type==="joker";
- return `<div class="card open ${joker?'joker':''} ${red?'redSuit':''}">
- <div class="corner">${joker?'JK':c.rank}</div>${joker?face("Joker"):face(c.rank)}
- <div class="rank">${joker?'JOKER':c.rank}</div><div class="suit">${joker?'★':c.suit}</div></div>`;
+ if(joker)return `<div class="card open joker"><div class="corner">JK</div><div class="rank">JOKER</div><div class="corner2">JK</div></div>`;
+ return `<div class="card open ${red?'redSuit':''}">
+ <div class="corner">${c.rank}<br>${c.suit}</div>
+ ${faceArt(c.rank)}
+ <div class="rank">${c.rank}</div>
+ ${pips(c.rank,c.suit)}
+ <div class="corner2">${c.rank}<br>${c.suit}</div>
+ </div>`;
 }
 function home(){
  phase="home";
  screen.innerHTML=bg()+`
  <div class="title">DICE FLIP</div>
- <div class="row"><button class="btn gold" onclick="setJoker(1)">JOKER 1</button><button class="btn gold" onclick="setJoker(2)">JOKER 2</button></div>
- <div class="row"><button class="btn gold" onclick="setJoker(3)">JOKER 3</button><button class="btn gold" onclick="setJoker(4)">JOKER 4</button></div>
+ <div class="row"><button class="btn gold" onclick="setJoker(4)">JK 4</button><button class="btn gold" onclick="setJoker(5)">JK 5</button><button class="btn gold" onclick="setJoker(6)">JK 6</button></div>
+ <div class="row"><button class="btn gold" onclick="setJoker(7)">JK 7</button><button class="btn gold" onclick="setJoker(8)">JK 8</button></div>
  <button class="btn green" onclick="start()">GO</button>
- <div class="hud"><div class="box">P1</div><div class="box big">JOKER ${jokerCount}</div><div class="box">P2</div></div>`+end();
+ <div class="msg">JOKER ${jokerCount}</div>`+end();
 }
 function setJoker(n){jokerCount=n;sfx("click");home()}
 function start(){
  sfx("start");
- let pool=[];suits.forEach(s=>ranks.forEach(r=>pool.push({type:"normal",rank:r,suit:s,open:false})));
- pool=shuffle(pool).slice(0,20-jokerCount);
- for(let i=0;i<jokerCount;i++)pool.push({type:"joker",rank:"JOKER",suit:"★",open:false});
- deck=shuffle(pool);turn=1;dice=1;mustOpen=0;openedThisTurn=0;gameOver=false;phase="roll";draw("GO");
+ const normalCount=20-jokerCount;
+ let normal=[];
+ for(const r of rankOrder){
+  for(const s of suits){
+   if(normal.length<normalCount)normal.push({type:"normal",rank:r,suit:s,open:false});
+  }
+ }
+ let jokers=Array.from({length:jokerCount},()=>({type:"joker",rank:"JOKER",suit:"★",open:false}));
+ deck=shuffle([...normal,...jokers]);
+ turn=1;dice=1;mustOpen=0;openedThisTurn=0;gameOver=false;phase="roll";draw("GO");
 }
 function rollDice(){
  if(phase!=="roll"||gameOver)return;
  sfx("roll");phase="rolling";draw("GO");
- setTimeout(()=>{dice=1+Math.floor(Math.random()*6);const left=deck.filter(c=>!c.open).length;mustOpen=Math.min(dice,left);openedThisTurn=0;phase="open";draw("OPEN")},720);
+ setTimeout(()=>{
+  dice=1+Math.floor(Math.random()*6);
+  const left=deck.filter(c=>!c.open).length;
+  mustOpen=Math.min(dice,left);
+  openedThisTurn=0;phase="open";draw("OPEN");
+ },720);
 }
 function draw(msg=""){
- const opened=deck.filter(c=>c.open).length,jokerOpened=deck.filter(c=>c.type==="joker"&&c.open).length;
+ const jk=deck.filter(c=>c.type==="joker"&&c.open).length;
  screen.innerHTML=bg()+`
  <div class="title">DICE FLIP</div>
  <div class="hud">
-  <div class="box">P${turn}<br><span class="big">${phase==="roll"?"GO":phase==="open"?openedThisTurn+"/"+mustOpen:""}</span></div>
+  <div class="box">P${turn}<br><span class="big">${phase==="open"?openedThisTurn+"/"+mustOpen:"GO"}</span></div>
   <div class="box">${diceHTML()}</div>
-  <div class="box">JK<br><span class="big">${jokerOpened}/${jokerCount}</span></div>
+  <div class="box">JK<br><span class="big">${jk}/${jokerCount}</span></div>
  </div>
- <button class="btn green" onclick="rollDice()" ${phase==="roll"&&!gameOver?"":"disabled"}>GO</button>
  <div class="grid">${deck.map(cardHTML).join("")}</div>
  <div class="msg">${msg}</div>
  <div class="row"><button class="btn red" onclick="home()">RESET</button><button class="btn gold" onclick="start()">RETRY</button></div>`+end();
@@ -145,9 +165,11 @@ function flip(i){
  deck[i].open=true;openedThisTurn++;
  let msg="OK";
  if(deck[i].type==="joker"){sfx("joker");msg="LOSE"}else{sfx("normal")}
- const jokerOpened=deck.filter(c=>c.type==="joker"&&c.open).length;
- if(jokerOpened>=jokerCount){gameOver=true;phase="end";setTimeout(()=>sfx("finish"),220);draw("WIN");return}
- if(openedThisTurn>=mustOpen){turn=turn===1?2:1;dice=1;mustOpen=0;openedThisTurn=0;phase="roll";sfx("next");draw("GO");return}
+ const jk=deck.filter(c=>c.type==="joker"&&c.open).length;
+ if(jk>=jokerCount){gameOver=true;phase="end";setTimeout(()=>sfx("finish"),220);draw("WIN");return}
+ if(openedThisTurn>=mustOpen){
+  turn=turn===1?2:1;dice=1;mustOpen=0;openedThisTurn=0;phase="roll";sfx("next");draw("GO");return;
+ }
  draw(msg);
 }
 home();
