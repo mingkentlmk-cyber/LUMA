@@ -11,15 +11,14 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#060816;col
 body{position:fixed;inset:0}
 #app{height:100dvh;padding:max(env(safe-area-inset-top),10px) 10px max(env(safe-area-inset-bottom),14px);display:flex;justify-content:center;background:radial-gradient(circle at top,#314a8c,#070915 72%)}
 .game{width:100%;max-width:430px;height:100%;border:5px solid #ffe27a;border-radius:18px;background:#11182f;box-shadow:0 0 0 5px #000,0 0 28px #416cff;position:relative;overflow:hidden;padding:10px}
-.bg{position:absolute;inset:0;background:radial-gradient(#fff 1.5px,transparent 2px) 20px 30px/90px 90px,radial-gradient(#9be7ff 1px,transparent 2px) 60px 80px/110px 110px;opacity:.55;animation:twinkle 1.4s infinite alternate}
+.bg{position:absolute;inset:0;background:radial-gradient(#fff 1.5px,transparent 2px) 20px 30px/90px 90px,radial-gradient(#9be7ff 1px,transparent 2px) 60px 80px/110px 110px;opacity:.55}
 .scan{position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(255,255,255,.04) 51%);background-size:100% 6px;pointer-events:none;z-index:9}
 .ui{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;gap:8px}
 .title{text-align:center;font-size:25px;font-weight:900;color:#ffe27a;text-shadow:3px 3px #000,5px 5px #5d39ff;letter-spacing:2px}
 .row{display:flex;gap:7px}
 button{font-family:monospace;font-weight:900;color:#fff;background:#263b77;border:4px solid #fff;box-shadow:4px 4px #000;text-shadow:2px 2px #000}
 button:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
-.small{flex:1;height:38px;font-size:13px}
-.gold{background:#a36a13;color:#fff3b0}.red{background:#842036}.green{background:#16724d}
+.small{flex:1;height:38px;font-size:13px}.gold{background:#a36a13;color:#fff3b0}.red{background:#842036}.green{background:#16724d}
 .hud{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:7px}
 .panel{border:3px solid #fff;background:#091024;box-shadow:3px 3px #000;text-align:center;padding:6px;font-size:12px;color:#9be7ff}
 .big{display:block;color:#ffe27a;font-size:20px;text-shadow:3px 3px #000}
@@ -29,8 +28,6 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
 .jk.on{background:linear-gradient(#e0a91f,#9f6c0c);color:#fff3b0}
 .go{height:76px;font-size:42px;background:linear-gradient(#31b95f,#16713b)}
 .msg{text-align:center;height:28px;font-size:24px;color:#ffe27a;text-shadow:4px 4px #000}
-
-/* GAME 1 */
 .grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;align-content:center;justify-items:center}
 .card{width:100%;max-width:72px;aspect-ratio:2.5/3.5;border:3px solid #111;border-radius:10px;box-shadow:0 0 0 3px #fff,0 0 0 5px #000,0 0 12px #4d7cff;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .back{background:linear-gradient(135deg,#193168,#0b1538)}
@@ -42,8 +39,6 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
 .icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:60px;height:60px;image-rendering:pixelated}
 .clown{width:58px;height:62px;animation:jokerMove .65s steps(1) infinite}
 .chest{animation:safeMove .9s steps(1) infinite}
-
-/* 3D DICE */
 .diceBox{height:62px;display:flex;align-items:center;justify-content:center;perspective:500px}
 .diceBox.ready{animation:diceGlow 1s infinite alternate}
 .dice{width:50px;height:50px;position:relative;transform-style:preserve-3d;transition:.5s cubic-bezier(.15,1.2,.3,1)}
@@ -52,16 +47,12 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
 .f1{transform:rotateX(90deg) translateZ(25px)}.f2{transform:translateZ(25px)}.f3{transform:rotateY(90deg) translateZ(25px)}.f4{transform:rotateY(-90deg) translateZ(25px)}.f5{transform:rotateY(180deg) translateZ(25px)}.f6{transform:rotateX(-90deg) translateZ(25px)}
 .show1{transform:rotateX(-90deg)}.show2{transform:rotateX(0)}.show3{transform:rotateY(-90deg)}.show4{transform:rotateY(90deg)}.show5{transform:rotateY(180deg)}.show6{transform:rotateX(90deg)}
 .dot{position:absolute;width:7px;height:7px;background:#111}.c{left:18px;top:18px}.tl{left:9px;top:9px}.tr{right:9px;top:9px}.bl{left:9px;bottom:9px}.br{right:9px;bottom:9px}.ml{left:9px;top:18px}.mr{right:9px;top:18px}
-
-/* GAME 2 */
 .stage{flex:1;position:relative;overflow:hidden;border:4px solid #fff;background:linear-gradient(#101936,#080b18);box-shadow:4px 4px #000;touch-action:manipulation}
-.stage:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 25%,rgba(77,124,255,.25),transparent 45%);z-index:0}
 .world{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1}
 .centerLine{position:absolute;left:50%;top:0;bottom:0;width:3px;background:#ffe27a;box-shadow:0 0 12px #ffe27a;z-index:2;opacity:.65}
 .previewDice{position:absolute;width:66px;height:66px;transform:translate(-50%,-50%);background:#f8f0d0;border:5px solid #111;box-shadow:inset -7px -7px #b8a56e,inset 4px 4px #fff,0 0 16px #ffe27a;z-index:4}
+.dropGuide{position:absolute;left:0;right:0;top:118px;height:2px;background:rgba(255,226,122,.7);box-shadow:0 0 10px #ffe27a;z-index:3}
 .warn{animation:warn .25s infinite alternate}
-
-@keyframes twinkle{to{opacity:.9}}
 @keyframes flip{0%{transform:rotateY(90deg) scale(.85);filter:brightness(2)}100%{transform:rotateY(0) scale(1)}}
 @keyframes safeMove{33%{transform:translate(-50%,-54%) scale(1.05);filter:drop-shadow(0 0 10px #ffe27a)}66%{transform:translate(-50%,-48%)}}
 @keyframes jokerMove{33%{transform:translate(-50%,-54%) rotate(-5deg) scale(1.05);filter:drop-shadow(0 0 12px #ff3860)}66%{transform:translate(-50%,-48%) rotate(5deg)}}
@@ -70,374 +61,137 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
 @keyframes warn{from{filter:drop-shadow(0 0 0 red)}to{filter:drop-shadow(0 0 18px red)}}
 </style>
 </head>
-
 <body>
 <div id="app"><div class="game"><div class="bg"></div><div class="scan"></div><div class="ui" id="ui"></div></div></div>
 
 <script>
 const ui=document.getElementById("ui");
-
-let screen="select";
-let deck=[],jk=4,turn=1,phase="menu",dice=1,must=0,opened=0,over=false;
-
+let screen="select",deck=[],jk=4,turn=1,phase="menu",dice=1,must=0,opened=0,over=false;
 let ctx,sfxOn=true,bgmOn=false,bgm;
+let engine,render,runner,canvas,stage,floors=[],player=1,need=0,placed=0,g2Phase="roll",fall=false;
+let stageW=0,stageH=0,groundY=0,baseGroundY=0,dropScreenY=118,previewLoop=false,dangerDebt=0;
 
-let engine,render,runner,canvas,stage;
-let floors=[],player=1,need=0,placed=0,g2Phase="roll",fall=false;
-let cameraY=0,previewLoop=false;
-let stageW=0,stageH=0,groundY=0;
-
-function audio(){
- ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();
- if(ctx.state==="suspended")ctx.resume();
-}
+function audio(){ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==="suspended")ctx.resume()}
 addEventListener("pointerdown",audio,{once:true});
-
-function tone(f,t=.07,type="square",g=.04){
- if(!sfxOn)return; audio();
- const o=ctx.createOscillator(),v=ctx.createGain();
- o.type=type;o.frequency.value=f;v.gain.value=g;
- o.connect(v);v.connect(ctx.destination);o.start();
- v.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+t);
- o.stop(ctx.currentTime+t+.01);
-}
-
-function noise(){
- if(!sfxOn)return; audio();
- const b=ctx.createBuffer(1,ctx.sampleRate*.035,ctx.sampleRate),d=b.getChannelData(0);
- for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
- const s=ctx.createBufferSource(),g=ctx.createGain();
- g.gain.value=.035;s.buffer=b;s.connect(g);g.connect(ctx.destination);s.start();
-}
-
-function fx(t){
- if(t==="roll"){
-  for(let i=0;i<8;i++)setTimeout(()=>{noise();tone(180+Math.random()*230,.03)},i*55);
-  return;
- }
- if(t==="bad"){tone(110,.12,"sawtooth",.08);setTimeout(()=>tone(70,.16,"sawtooth",.07),90);return}
- if(t==="win"){[520,660,780,1040].forEach((f,i)=>setTimeout(()=>tone(f,.08),i*80));return}
- if(t==="drop"){tone(280,.06,"triangle",.06);noise();return}
- [620,900].forEach((f,i)=>setTimeout(()=>tone(f,.05),i*60));
-}
-
+function tone(f,t=.07,type="square",g=.04){if(!sfxOn)return;audio();let o=ctx.createOscillator(),v=ctx.createGain();o.type=type;o.frequency.value=f;v.gain.value=g;o.connect(v);v.connect(ctx.destination);o.start();v.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+t);o.stop(ctx.currentTime+t+.01)}
+function noise(){if(!sfxOn)return;audio();let b=ctx.createBuffer(1,ctx.sampleRate*.035,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;let s=ctx.createBufferSource(),g=ctx.createGain();g.gain.value=.035;s.buffer=b;s.connect(g);g.connect(ctx.destination);s.start()}
+function fx(t){if(t==="roll"){for(let i=0;i<8;i++)setTimeout(()=>{noise();tone(180+Math.random()*230,.03)},i*55);return}if(t==="bad"){tone(110,.12,"sawtooth",.08);setTimeout(()=>tone(70,.16,"sawtooth",.07),90);return}if(t==="win"){[520,660,780,1040].forEach((f,i)=>setTimeout(()=>tone(f,.08),i*80));return}if(t==="drop"){tone(280,.06,"triangle",.06);noise();return}[620,900].forEach((f,i)=>setTimeout(()=>tone(f,.05),i*60))}
 function toggleSfx(){sfxOn=!sfxOn;renderApp()}
-function toggleBgm(){
- audio();bgmOn=!bgmOn;
- if(bgmOn){
-  let s=0;
-  bgm=setInterval(()=>{
-   let n=[220,0,330,0,440,0,330,165][s++%8];
-   if(n)tone(n,.06,"square",.015);
-  },150);
- }else clearInterval(bgm);
- renderApp();
-}
-function topbar(){
- return `<div class="row"><button class="small gold" onclick="toggleBgm()">BGM ${bgmOn?"ON":"OFF"}</button><button class="small gold" onclick="toggleSfx()">SFX ${sfxOn?"ON":"OFF"}</button></div>`;
-}
+function toggleBgm(){audio();bgmOn=!bgmOn;if(bgmOn){let s=0;bgm=setInterval(()=>{let n=[220,0,330,0,440,0,330,165][s++%8];if(n)tone(n,.06,"square",.015)},150)}else clearInterval(bgm);renderApp()}
+function topbar(){return `<div class="row"><button class="small gold" onclick="toggleBgm()">BGM ${bgmOn?"ON":"OFF"}</button><button class="small gold" onclick="toggleSfx()">SFX ${sfxOn?"ON":"OFF"}</button></div>`}
+function pips(n){return({1:["c"],2:["tl","br"],3:["tl","c","br"],4:["tl","tr","bl","br"],5:["tl","tr","c","bl","br"],6:["tl","tr","ml","mr","bl","br"]}[n]).map(x=>`<i class="dot ${x}"></i>`).join("")}
+function diceHTML(){let ready=(screen==="g2"?g2Phase==="roll":phase==="roll")&&!over&&!fall;return `<div class="diceBox ${ready?"ready":""}" onclick="${screen==='g2'?'rollG2()':'rollG1()'}"><div class="dice ${(phase==="rolling"||g2Phase==="rolling")?"roll":"show"+dice}">${[1,2,3,4,5,6].map(n=>`<div class="face f${n}">${pips(n)}</div>`).join("")}</div></div>`}
+function selectScreen(){screen="select";stopMatter();ui.innerHTML=`<div class="title">DICE GAMES</div>${topbar()}<div class="menu"><button class="menuBtn" onclick="game1Menu()">GAME 1<br>JOKER FLIP</button><button class="menuBtn" onclick="game2Start()">GAME 2<br>DICE TOWER</button></div>`}
 
-function pips(n){
- return ({
-  1:["c"],2:["tl","br"],3:["tl","c","br"],
-  4:["tl","tr","bl","br"],5:["tl","tr","c","bl","br"],
-  6:["tl","tr","ml","mr","bl","br"]
- }[n]).map(x=>`<i class="dot ${x}"></i>`).join("");
-}
+function chest(){return `<svg class="icon chest" viewBox="0 0 64 64"><rect x="10" y="20" width="44" height="34" fill="#2a1607"/><rect x="14" y="24" width="36" height="26" fill="#b56b20"/><rect x="16" y="26" width="32" height="8" fill="#f3b23b"/><rect x="14" y="34" width="36" height="4" fill="#46240d"/><rect x="18" y="40" width="28" height="8" fill="#8b4b19"/><rect x="26" y="31" width="12" height="15" fill="#ffe27a"/><rect x="28" y="34" width="8" height="6" fill="#1fc7e8"/><rect x="8" y="18" width="48" height="8" fill="#1b1007"/><rect x="12" y="16" width="40" height="8" fill="#ffcf24"/><rect x="17" y="18" width="10" height="3" fill="#fff2a6"/><rect x="37" y="18" width="8" height="3" fill="#9a5a18"/><rect x="9" y="52" width="46" height="4" fill="#111"/></svg>`}
+function clown(){return `<svg class="icon clown" viewBox="0 0 64 64"><rect x="20" y="4" width="24" height="8" fill="#111"/><rect x="16" y="8" width="32" height="10" fill="#b40023"/><rect x="10" y="12" width="12" height="12" fill="#f3c04d"/><rect x="42" y="12" width="12" height="12" fill="#f3c04d"/><rect x="18" y="18" width="28" height="30" fill="#111"/><rect x="21" y="21" width="22" height="22" fill="#f7d7a7"/><rect x="35" y="22" width="8" height="20" fill="#d49b75"/><rect x="24" y="28" width="6" height="4" fill="#fff"/><rect x="34" y="28" width="6" height="4" fill="#fff"/><rect x="26" y="30" width="2" height="2" fill="#111"/><rect x="36" y="30" width="2" height="2" fill="#111"/><rect x="31" y="34" width="4" height="4" fill="#ff304d"/><rect x="26" y="40" width="12" height="2" fill="#111"/><rect x="28" y="42" width="8" height="3" fill="#ff304d"/><rect x="14" y="48" width="36" height="10" fill="#111"/><rect x="18" y="50" width="14" height="7" fill="#4db7ff"/><rect x="32" y="50" width="14" height="7" fill="#2f82d0"/><rect x="20" y="52" width="5" height="3" fill="#ffe066"/><rect x="39" y="52" width="5" height="3" fill="#ffe066"/></svg>`}
+function card(c,i){if(!c.open)return `<div class="card back" onclick="flip(${i})"></div>`;return `<div class="card open ${c.type==="bad"?"jokerCard":"safeCard"}">${c.type==="bad"?clown():chest()}</div>`}
+function game1Shell(mid,msg=""){let count=deck.filter(x=>x.type==="bad"&&x.open).length;ui.innerHTML=`<div class="title">JOKER FLIP</div>${topbar()}<div class="hud"><div class="panel">P${turn}<span class="big">${phase==="open"?opened+"/"+must:"GO"}</span></div><div class="panel">${diceHTML()}</div><div class="panel">JK<span class="big">${count}/${jk}</span></div></div>${mid}<div class="msg">${msg}</div>`}
+function game1Menu(){screen="g1";stopMatter();phase="menu";game1Shell(`<div class="menu">${[4,5,6,7,8].map(n=>`<button class="jk ${jk===n?"on":""}" onclick="jk=${n};game1Menu()">JOKER ${n}</button>`).join("")}<button class="go" onclick="startG1()">GO</button><button class="small red" onclick="selectScreen()">BACK</button></div>`,`JK ${jk}`)}
+function startG1(){deck=[...Array.from({length:20-jk},()=>({type:"safe",open:false})),...Array.from({length:jk},()=>({type:"bad",open:false}))].sort(()=>Math.random()-.5);turn=1;dice=1;opened=0;must=0;over=false;phase="roll";fx("win");drawG1("GO")}
+function drawG1(msg=""){game1Shell(`<div class="grid">${deck.map(card).join("")}</div><div class="row"><button class="small red" onclick="game1Menu()">RESET</button><button class="small gold" onclick="startG1()">RETRY</button></div>`,msg)}
+function rollG1(){if(phase!=="roll"||over)return;phase="rolling";fx("roll");drawG1("GO");setTimeout(()=>{dice=Math.floor(Math.random()*6)+1;must=Math.min(dice,deck.filter(x=>!x.open).length);opened=0;phase="open";drawG1("OPEN")},700)}
+function flip(i){if(phase!=="open"||deck[i].open||over)return;deck[i].open=true;opened++;let bad=deck[i].type==="bad";fx(bad?"bad":"safe");let count=deck.filter(x=>x.type==="bad"&&x.open).length;if(count>=jk){over=true;fx("win");drawG1("WIN");return}if(opened>=must){turn=turn===1?2:1;phase="roll";opened=0;must=0;dice=1;setTimeout(()=>drawG1("GO"),350)}else drawG1(bad?"LOSE":"OK")}
 
-function diceHTML(){
- let ready=(screen==="g2"?g2Phase==="roll":phase==="roll")&&!over&&!fall;
- return `<div class="diceBox ${ready?"ready":""}" onclick="${screen==='g2'?'rollG2()':'rollG1()'}"><div class="dice ${(phase==="rolling"||g2Phase==="rolling")?"roll":"show"+dice}">${[1,2,3,4,5,6].map(n=>`<div class="face f${n}">${pips(n)}</div>`).join("")}</div></div>`;
-}
-
-function selectScreen(){
- screen="select";
- stopMatter();
- ui.innerHTML=`<div class="title">DICE GAMES</div>${topbar()}<div class="menu"><button class="menuBtn" onclick="game1Menu()">GAME 1<br>JOKER FLIP</button><button class="menuBtn" onclick="game2Start()">GAME 2<br>DICE TOWER</button></div>`;
-}
-
-/* GAME 1 */
-function chest(){
- return `<svg class="icon chest" viewBox="0 0 64 64"><rect x="10" y="20" width="44" height="34" fill="#2a1607"/><rect x="14" y="24" width="36" height="26" fill="#b56b20"/><rect x="16" y="26" width="32" height="8" fill="#f3b23b"/><rect x="14" y="34" width="36" height="4" fill="#46240d"/><rect x="18" y="40" width="28" height="8" fill="#8b4b19"/><rect x="26" y="31" width="12" height="15" fill="#ffe27a"/><rect x="28" y="34" width="8" height="6" fill="#1fc7e8"/><rect x="8" y="18" width="48" height="8" fill="#1b1007"/><rect x="12" y="16" width="40" height="8" fill="#ffcf24"/><rect x="17" y="18" width="10" height="3" fill="#fff2a6"/><rect x="37" y="18" width="8" height="3" fill="#9a5a18"/><rect x="9" y="52" width="46" height="4" fill="#111"/></svg>`;
-}
-function clown(){
- return `<svg class="icon clown" viewBox="0 0 64 64"><rect x="20" y="4" width="24" height="8" fill="#111"/><rect x="16" y="8" width="32" height="10" fill="#b40023"/><rect x="10" y="12" width="12" height="12" fill="#f3c04d"/><rect x="42" y="12" width="12" height="12" fill="#f3c04d"/><rect x="18" y="18" width="28" height="30" fill="#111"/><rect x="21" y="21" width="22" height="22" fill="#f7d7a7"/><rect x="35" y="22" width="8" height="20" fill="#d49b75"/><rect x="24" y="28" width="6" height="4" fill="#fff"/><rect x="34" y="28" width="6" height="4" fill="#fff"/><rect x="26" y="30" width="2" height="2" fill="#111"/><rect x="36" y="30" width="2" height="2" fill="#111"/><rect x="31" y="34" width="4" height="4" fill="#ff304d"/><rect x="26" y="40" width="12" height="2" fill="#111"/><rect x="28" y="42" width="8" height="3" fill="#ff304d"/><rect x="14" y="48" width="36" height="10" fill="#111"/><rect x="18" y="50" width="14" height="7" fill="#4db7ff"/><rect x="32" y="50" width="14" height="7" fill="#2f82d0"/><rect x="20" y="52" width="5" height="3" fill="#ffe066"/><rect x="39" y="52" width="5" height="3" fill="#ffe066"/></svg>`;
-}
-function card(c,i){
- if(!c.open)return `<div class="card back" onclick="flip(${i})"></div>`;
- return `<div class="card open ${c.type==="bad"?"jokerCard":"safeCard"}">${c.type==="bad"?clown():chest()}</div>`;
-}
-function game1Shell(mid,msg=""){
- let count=deck.filter(x=>x.type==="bad"&&x.open).length;
- ui.innerHTML=`<div class="title">JOKER FLIP</div>${topbar()}<div class="hud"><div class="panel">P${turn}<span class="big">${phase==="open"?opened+"/"+must:"GO"}</span></div><div class="panel">${diceHTML()}</div><div class="panel">JK<span class="big">${count}/${jk}</span></div></div>${mid}<div class="msg">${msg}</div>`;
-}
-function game1Menu(){
- screen="g1";stopMatter();phase="menu";
- game1Shell(`<div class="menu">${[4,5,6,7,8].map(n=>`<button class="jk ${jk===n?"on":""}" onclick="jk=${n};game1Menu()">JOKER ${n}</button>`).join("")}<button class="go" onclick="startG1()">GO</button><button class="small red" onclick="selectScreen()">BACK</button></div>`,`JK ${jk}`);
-}
-function startG1(){
- deck=[...Array.from({length:20-jk},()=>({type:"safe",open:false})),...Array.from({length:jk},()=>({type:"bad",open:false}))].sort(()=>Math.random()-.5);
- turn=1;dice=1;opened=0;must=0;over=false;phase="roll";
- fx("win");
- drawG1("GO");
-}
-function drawG1(msg=""){
- game1Shell(`<div class="grid">${deck.map(card).join("")}</div><div class="row"><button class="small red" onclick="game1Menu()">RESET</button><button class="small gold" onclick="startG1()">RETRY</button></div>`,msg);
-}
-function rollG1(){
- if(phase!=="roll"||over)return;
- phase="rolling";fx("roll");drawG1("GO");
- setTimeout(()=>{
-  dice=Math.floor(Math.random()*6)+1;
-  must=Math.min(dice,deck.filter(x=>!x.open).length);
-  opened=0;phase="open";drawG1("OPEN");
- },700);
-}
-function flip(i){
- if(phase!=="open"||deck[i].open||over)return;
- deck[i].open=true;opened++;
- let bad=deck[i].type==="bad";
- fx(bad?"bad":"safe");
- let count=deck.filter(x=>x.type==="bad"&&x.open).length;
- if(count>=jk){over=true;fx("win");drawG1("WIN");return}
- if(opened>=must){
-  turn=turn===1?2:1;
-  phase="roll";opened=0;must=0;dice=1;
-  setTimeout(()=>drawG1("GO"),350);
- }else drawG1(bad?"LOSE":"OK");
-}
-
-/* GAME 2 - TRUE DICE STACK */
 function game2Start(){
- screen="g2";
- stopMatter();
- turn=1;player=1;dice=1;floors=[];need=0;placed=0;
- g2Phase="roll";fall=false;cameraY=0;previewLoop=false;
-
- ui.innerHTML=`<div class="title">DICE TOWER</div>${topbar()}<div class="hud"><div class="panel">P1<span class="big" id="g2p">READY</span></div><div class="panel">${diceHTML()}</div><div class="panel">BAL<span class="big" id="bal">0</span></div></div><div class="stage" id="stage"><canvas class="world" id="world"></canvas><div class="centerLine"></div><div class="previewDice" id="preview" style="display:none"></div></div><div class="msg" id="g2msg">ROLL</div><div class="row"><button class="small red" onclick="selectScreen()">BACK</button><button class="small gold" onclick="game2Start()">RETRY</button></div>`;
+ screen="g2";stopMatter();turn=1;player=1;dice=1;floors=[];need=0;placed=0;g2Phase="roll";fall=false;previewLoop=false;dangerDebt=0;
+ ui.innerHTML=`<div class="title">DICE TOWER</div>${topbar()}<div class="hud"><div class="panel">P1<span class="big" id="g2p">READY</span></div><div class="panel">${diceHTML()}</div><div class="panel">BAL<span class="big" id="bal">0</span></div></div><div class="stage" id="stage"><canvas class="world" id="world"></canvas><div class="centerLine"></div><div class="dropGuide"></div><div class="previewDice" id="preview" style="display:none"></div></div><div class="msg" id="g2msg">ROLL</div><div class="row"><button class="small red" onclick="selectScreen()">BACK</button><button class="small gold" onclick="game2Start()">RETRY</button></div>`;
  setTimeout(initMatter,50);
 }
-
 function initMatter(){
- const M=Matter;
- stage=document.getElementById("stage");
- canvas=document.getElementById("world");
-
- const r=stage.getBoundingClientRect();
- stageW=r.width;
- stageH=r.height;
- canvas.width=stageW;
- canvas.height=stageH;
-
- engine=M.Engine.create();
- engine.gravity.y=1.25;
-
- render=M.Render.create({
-  canvas,
-  engine,
-  options:{
-   width:stageW,
-   height:stageH,
-   wireframes:false,
-   background:"transparent",
-   hasBounds:true
-  }
- });
-
- groundY=stageH-34;
- const ground=M.Bodies.rectangle(stageW/2,groundY,stageW+120,26,{
-  isStatic:true,
-  render:{fillStyle:"#5b3b18",strokeStyle:"#ffe27a",lineWidth:4}
- });
-
- M.Composite.add(engine.world,[ground]);
- runner=M.Runner.create();
- M.Render.run(render);
- M.Runner.run(runner,engine);
- M.Events.on(engine,"afterUpdate",updateG2);
+ const M=Matter;stage=document.getElementById("stage");canvas=document.getElementById("world");
+ const r=stage.getBoundingClientRect();stageW=r.width;stageH=r.height;canvas.width=stageW;canvas.height=stageH;
+ engine=M.Engine.create();engine.gravity.y=1.18;
+ render=M.Render.create({canvas,engine,options:{width:stageW,height:stageH,wireframes:false,background:"transparent",hasBounds:true}});
+ baseGroundY=stageH-34;groundY=baseGroundY;
+ const ground=M.Bodies.rectangle(stageW/2,groundY,stageW+120,26,{isStatic:true,render:{fillStyle:"#5b3b18",strokeStyle:"#ffe27a",lineWidth:4}});
+ M.Composite.add(engine.world,[ground]);runner=M.Runner.create();M.Render.run(render);M.Runner.run(runner,engine);M.Events.on(engine,"afterUpdate",updateG2);
 }
-
-function stopMatter(){
- if(render){
-  Matter.Render.stop(render);
-  Matter.Runner.stop(runner);
-  Matter.Composite.clear(engine.world);
-  Matter.Engine.clear(engine);
-  render=null;engine=null;runner=null;
+function stopMatter(){if(render){Matter.Render.stop(render);Matter.Runner.stop(runner);Matter.Composite.clear(engine.world);Matter.Engine.clear(engine);render=null;engine=null;runner=null}}
+function makeDiceBlock(x,y){
+ return Matter.Bodies.rectangle(x,y,66,66,{restitution:.005,friction:.99,frictionStatic:1.4,density:.005,slop:.03,render:{fillStyle:"#f8f0d0",strokeStyle:"#111",lineWidth:5}});
+}
+function getDropPos(){const swing=Math.sin(Date.now()/340)*44;return {x:stageW/2+swing,y:dropScreenY}}
+function shiftTowerDown(){
+ const targetTop=dropScreenY+86;
+ const top=floors.length?Math.min(...floors.map(b=>b.position.y)):baseGroundY;
+ const shift=targetTop-top;
+ if(Math.abs(shift)>1){
+  Matter.Composite.allBodies(engine.world).forEach(b=>Matter.Body.translate(b,{x:0,y:shift}));
+  groundY+=shift;
  }
 }
-
-function makeDiceBlock(x,y){
- return Matter.Bodies.rectangle(x,y,66,66,{
-  restitution:.02,
-  friction:.96,
-  frictionStatic:1,
-  density:.004,
-  render:{fillStyle:"#f8f0d0",strokeStyle:"#111",lineWidth:5}
- });
+function assistSnap(){
+ if(floors.length<2)return;
+ const top=floors[floors.length-1], below=floors[floors.length-2];
+ const dx=top.position.x-below.position.x;
+ if(Math.abs(dx)<34){
+  Matter.Body.translate(top,{x:-dx*.55,y:0});
+  Matter.Body.setVelocity(top,{x:0,y:top.velocity.y*.25});
+  Matter.Body.setAngularVelocity(top,top.angularVelocity*.15);
+  Matter.Body.setAngle(top,top.angle*.35);
+ }
 }
-
-function getStackTopY(){
- if(!floors.length)return groundY-33;
- return Math.min(...floors.map(b=>b.position.y))-66;
-}
-
-function getDropPos(){
- let swing=Math.sin(Date.now()/320)*54;
- let y=getStackTopY()-105;
- return {x:stageW/2+swing,y};
-}
-
 function updatePreview(){
  if(screen!=="g2"||g2Phase!=="drop"||fall)return;
-
- let p=getDropPos();
- let pv=document.getElementById("preview");
-
- if(pv){
-  pv.style.display="block";
-  pv.style.left=p.x+"px";
-  pv.style.top=(p.y-cameraY)+"px";
-  pv.innerHTML=pips(dice);
- }
-
+ const p=getDropPos(),pv=document.getElementById("preview");
+ if(pv){pv.style.display="block";pv.style.left=p.x+"px";pv.style.top=p.y+"px";pv.innerHTML=pips(dice)}
  requestAnimationFrame(updatePreview);
 }
-
 function rollG2(){
  if(g2Phase!=="roll"||fall)return;
- g2Phase="rolling";
- fx("roll");
-
- let d=document.querySelector(".dice");
- if(d)d.classList.add("roll");
-
+ g2Phase="rolling";fx("roll");
+ const d=document.querySelector(".dice");if(d)d.classList.add("roll");
  setTimeout(()=>{
-  dice=Math.floor(Math.random()*6)+1;
-  need=dice;
-  placed=0;
-  g2Phase="drop";
-  game2Refresh("DROP");
-
-  if(!previewLoop){
-   previewLoop=true;
-   requestAnimationFrame(updatePreview);
-  }
+  dice=Math.floor(Math.random()*6)+1;need=dice;placed=0;g2Phase="drop";
+  shiftTowerDown();game2Refresh("DROP");
+  if(!previewLoop){previewLoop=true;requestAnimationFrame(updatePreview)}
  },700);
 }
-
 function game2Refresh(msg){
  if(screen!=="g2")return;
-
- let mid=document.querySelector(".hud .panel:nth-child(2)");
- if(mid)mid.innerHTML=diceHTML();
-
- let gp=document.getElementById("g2p");
- if(gp)gp.textContent=placed+"/"+(need||"-");
-
- let gm=document.getElementById("g2msg");
- if(gm)gm.textContent=msg;
+ const mid=document.querySelector(".hud .panel:nth-child(2)");if(mid)mid.innerHTML=diceHTML();
+ const gp=document.getElementById("g2p");if(gp)gp.textContent=placed+"/"+(need||"-");
+ const gm=document.getElementById("g2msg");if(gm)gm.textContent=msg;
 }
-
 function dropG2(){
  if(g2Phase!=="drop"||fall)return;
-
- let p=getDropPos();
- let body=makeDiceBlock(p.x,p.y);
-
- Matter.Composite.add(engine.world,body);
- floors.push(body);
-
- placed++;
- fx("drop");
-
- if(placed>=need)setTimeout(nextG2,850);
+ const p=getDropPos(),body=makeDiceBlock(p.x,p.y);
+ Matter.Composite.add(engine.world,body);floors.push(body);placed++;fx("drop");
+ setTimeout(()=>{assistSnap();shiftTowerDown()},320);
+ if(placed>=need)setTimeout(nextG2,900);
  game2Refresh(placed+"/"+need);
 }
-
 function nextG2(){
  if(fall)return;
-
- player=player===1?2:1;
- turn=player;
- g2Phase="roll";
- need=0;
- placed=0;
- dice=1;
- previewLoop=false;
-
- let pv=document.getElementById("preview");
- if(pv)pv.style.display="none";
-
+ assistSnap();shiftTowerDown();
+ player=player===1?2:1;turn=player;g2Phase="roll";need=0;placed=0;dice=1;previewLoop=false;
+ const pv=document.getElementById("preview");if(pv)pv.style.display="none";
  document.querySelector(".hud .panel:nth-child(1)").innerHTML=`P${player}<span class="big" id="g2p">READY</span>`;
  game2Refresh("ROLL");
 }
-
 function updateG2(){
  if(!floors.length||screen!=="g2")return;
-
- let avg=0,minY=9999,ang=0,topSwing=0;
-
- floors.forEach((b,i)=>{
-  avg+=b.position.x-stageW/2;
-  minY=Math.min(minY,b.position.y);
-  ang+=Math.abs(b.angle);
-  topSwing+=Math.abs(b.position.x-stageW/2)*(i/floors.length);
- });
-
+ let avg=0,ang=0,topSwing=0;
+ floors.forEach((b,i)=>{avg+=b.position.x-stageW/2;ang+=Math.abs(b.angle);topSwing+=Math.abs(b.position.x-stageW/2)*(i/floors.length)});
  avg/=floors.length;
-
- let bal=document.getElementById("bal");
- if(bal)bal.textContent=Math.round(avg);
-
- let targetCamera=Math.max(0,stageH*.45-minY);
- cameraY+=(targetCamera-cameraY)*.14;
-
- render.bounds.min.y=-cameraY;
- render.bounds.max.y=stageH-cameraY;
-
- let danger=Math.abs(avg)+ang*20+floors.length*.4;
- stage.classList.toggle("warn",danger>42);
-
- let sway=Math.sin(Date.now()/130)*Math.min(9,(topSwing/45)+(floors.length*.18));
- canvas.style.transform=`translateX(${sway}px) rotate(${sway*.08}deg)`;
-
- if(
-  Math.abs(avg)>86 ||
-  ang>2.9 ||
-  floors.some(b=>b.position.y+cameraY>stageH+180)
- ){
-  collapseG2();
- }
+ const bal=document.getElementById("bal");if(bal)bal.textContent=Math.round(avg);
+ const danger=Math.abs(avg)*.45+ang*8+floors.length*.14;
+ dangerDebt=danger>58?dangerDebt+1:Math.max(0,dangerDebt-2);
+ stage.classList.toggle("warn",danger>50);
+ const sway=Math.sin(Date.now()/140)*Math.min(7,(topSwing/60)+(floors.length*.12));
+ canvas.style.transform=`translateX(${sway}px) rotate(${sway*.05}deg)`;
+ if(Math.abs(avg)>150||ang>6.4||dangerDebt>80||floors.some(b=>b.position.y>stageH+240))collapseG2();
 }
-
 function collapseG2(){
  if(fall)return;
- fall=true;
- g2Phase="end";
- fx("bad");
-
- let m=document.getElementById("g2msg");
- if(m)m.textContent="LOSE";
-
+ fall=true;g2Phase="end";fx("bad");
+ const m=document.getElementById("g2msg");if(m)m.textContent="LOSE";
  stage.classList.add("warn");
-
- floors.forEach(b=>{
-  Matter.Body.applyForce(b,b.position,{x:(Math.random()-.5)*.08,y:-.03});
-  Matter.Body.setAngularVelocity(b,(Math.random()-.5)*.55);
- });
+ floors.forEach(b=>{Matter.Body.applyForce(b,b.position,{x:(Math.random()-.5)*.08,y:-.03});Matter.Body.setAngularVelocity(b,(Math.random()-.5)*.55)});
 }
-
-document.addEventListener("click",e=>{
- if(screen==="g2"&&e.target.closest("#stage"))dropG2();
-});
-
-function renderApp(){
- if(screen==="select")selectScreen();
- else if(screen==="g1")phase==="menu"?game1Menu():drawG1("");
- else game2Start();
-}
-
+document.addEventListener("click",e=>{if(screen==="g2"&&e.target.closest("#stage"))dropG2()});
+function renderApp(){if(screen==="select")selectScreen();else if(screen==="g1")phase==="menu"?game1Menu():drawG1("");else game2Start()}
 selectScreen();
 </script>
 </body>
