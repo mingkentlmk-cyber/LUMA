@@ -78,13 +78,38 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px #000}
 @keyframes warn{from{filter:drop-shadow(0 0 0 red)}to{filter:drop-shadow(0 0 18px red)}}
 @keyframes dangerShake{from{transform:translateX(-5px) rotate(-1.2deg)}to{transform:translateX(5px) rotate(1.2deg)}}
 @keyframes land{0%{filter:brightness(1.45)}100%{filter:brightness(1)}}
+
+/* JOKER SHOT RESULT + DRINK FLOW */
+.shotResult,.shotTrans{position:absolute;inset:0;z-index:80;background:rgba(3,5,14,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;pointer-events:auto;overflow:hidden;animation:shotScreenShake .42s steps(3) forwards;cursor:pointer}
+.shotResult:before,.shotTrans:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(255,255,255,.06) 51%);background-size:100% 6px;z-index:1;mix-blend-mode:screen;pointer-events:none}
+.shotResultBox,.shotTitle,.shotTray,.shotCount{position:relative;z-index:3}
+.shotResultBox{text-align:center;border:4px solid #fff;background:#091024;box-shadow:5px 5px #000,0 0 24px var(--pc,#ffe27a);padding:22px 24px;min-width:250px}
+.shotResultBox .r1{font-size:24px;color:#9be7ff;text-shadow:3px 3px #000;font-weight:900;letter-spacing:1px}
+.shotResultBox .r2{font-size:58px;color:#ffe27a;text-shadow:4px 4px #000,0 0 18px #ffe27a;font-weight:900;margin-top:8px}
+.shotResultBox .r3{font-size:13px;color:#fff;text-shadow:2px 2px #000;margin-top:10px;letter-spacing:1px}
+.shotTitle{text-align:center;font-size:28px;font-weight:900;color:#ffe27a;text-shadow:3px 3px #000,5px 5px var(--pc,#5d39ff);letter-spacing:2px;line-height:1.15}
+.shotHint{font-size:13px;color:#9be7ff;text-shadow:2px 2px #000;margin-top:6px;letter-spacing:1px}
+.shotCount{font-size:48px;color:#fff;text-shadow:4px 4px #000,0 0 18px #ffe27a}
+.shotTray{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:340px;padding:4px 12px}
+.shotTray.onlyCups{max-width:360px;gap:14px;transform:scale(1.08)}
+.shotCup{width:58px;height:78px;position:relative;border:4px solid #fff;box-shadow:4px 4px #000,0 0 0 3px #111,0 0 18px var(--pc,#ffe27a);background:linear-gradient(180deg,rgba(255,255,255,.16) 0 28%,#ffe27a 29%,#d99022 62%,#8a4f11 100%);clip-path:polygon(16% 0,84% 0,69% 100%,31% 100%);animation:shotCupPop .18s ease both}
+.shotCup:after{content:"";position:absolute;left:17%;right:17%;top:18%;height:8px;background:#fff6c7;box-shadow:0 0 10px #fff;border-radius:999px}
+.shotCup.empty{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));filter:grayscale(.4) brightness(.72);box-shadow:4px 4px #000,0 0 0 3px #111}
+.shotCup.empty:after{opacity:.18}
+.shotCup.drink{animation:shotDrink .34s cubic-bezier(.18,1.35,.22,1) forwards}
+.shotFlash{position:absolute;z-index:2;left:50%;top:50%;width:14px;height:14px;background:#ffe27a;box-shadow:0 0 16px #ffe27a;transform:translate(-50%,-50%);animation:shotPixelBurst .36s steps(3) forwards;pointer-events:none}
+@keyframes shotScreenShake{0%,100%{transform:translate(0)}25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,3px)}75%{transform:translate(3px,2px)}}
+@keyframes shotCupPop{0%{transform:translateY(80px) scale(.55);filter:brightness(2.2)}100%{transform:translateY(0) scale(1)}}
+@keyframes shotDrink{0%{transform:rotate(0) scale(1);opacity:1}45%{transform:rotate(16deg) translateY(-18px) scale(1.08);filter:brightness(1.8)}100%{transform:rotate(-8deg) translateY(-70px) scale(.35);opacity:0}}
+@keyframes shotPixelBurst{0%{box-shadow:0 0 #ffe27a;opacity:1}100%{opacity:0;box-shadow:-80px -34px #ffe27a,74px -44px #ffb02e,-70px 38px #fff3b0,86px 34px #d99022,-34px -72px #fff,38px 76px #ffe27a}}
+
 </style>
 </head>
 <body>
 <div id="app"><div class="game"><div class="ui" id="ui"></div></div></div>
 <script>
 const ui=document.getElementById("ui");
-let screen="select",deck=[],jk=4,turn=1,playerCount=2,phase="menu",dice=1,must=0,opened=0,over=false;const PCLR=["#ff3b5f","#2f8cff","#29d46b","#ffb02e"];
+let screen="select",deck=[],jk=4,turn=1,playerCount=2,phase="menu",dice=1,must=0,opened=0,over=false,turnShots=0;const PCLR=["#ff3b5f","#2f8cff","#29d46b","#ffb02e"];
 let ctx,sfxOn=true,bgmOn=false,bgmTimer,bgmStep=0;
 let g2={};
 
@@ -117,10 +142,29 @@ function clown(){return `<svg class="icon" viewBox="0 0 64 64"><rect x="16" y="8
 function card(c,i){return c.open?`<div class="card open ${c.type==="bad"?"jokerCard":"safeCard"}">${c.type==="bad"?clown():chest()}</div>`:`<div class="card back" onclick="flip(${i})"></div>`}
 function game1Shell(mid,msg=""){let count=deck.filter(x=>x.type==="bad"&&x.open).length;ui.innerHTML=`<div class="title">JOKER FLIP</div>${topbar()}${turnBanner(turn)}<div class="hud" style="--pc:${PCLR[(turn-1)%4]}"><div class="panel activeP">P${turn}<span class="big">${phase==="open"?opened+"/"+must:"GO"}</span></div><div class="panel">${diceHTML()}</div><div class="panel">JK<span class="big">${count}/${jk}</span></div></div>${playerChips(turn)}${mid}<div class="msg">${msg}</div>`}
 function game1Menu(){screen="g1";phase="menu";applyPlayerTheme(turn);game1Shell(`<div class="menu">${[4,5,6,7,8].map(n=>`<button class="jk ${jk===n?"on":""}" onclick="jk=${n};game1Menu()">JOKER ${n}</button>`).join("")}<button class="go" onclick="startG1()">GO</button><button class="small red" onclick="selectScreen()">BACK</button></div>`,`JK ${jk}`)}
-function startG1(){turn=1;applyPlayerTheme(turn);deck=[...Array.from({length:20-jk},()=>({type:"safe",open:false})),...Array.from({length:jk},()=>({type:"bad",open:false}))].sort(()=>Math.random()-.5);dice=1;opened=0;must=0;over=false;phase="roll";fx("win");drawG1("GO")}
+function startG1(){turn=1;applyPlayerTheme(turn);deck=[...Array.from({length:20-jk},()=>({type:"safe",open:false})),...Array.from({length:jk},()=>({type:"bad",open:false}))].sort(()=>Math.random()-.5);dice=1;opened=0;must=0;turnShots=0;over=false;phase="roll";fx("win");drawG1("GO")}
 function drawG1(msg=""){game1Shell(`<div class="grid">${deck.map(card).join("")}</div><div class="row"><button class="small red" onclick="game1Menu()">RESET</button><button class="small gold" onclick="startG1()">RETRY</button></div>`,msg)}
-function rollG1(){if(phase!=="roll"||over)return;phase="rolling";fx("roll");drawG1("GO");setTimeout(()=>{dice=Math.floor(Math.random()*6)+1;must=Math.min(dice,deck.filter(x=>!x.open).length);opened=0;phase="open";drawG1("OPEN")},650)}
-function flip(i){if(phase!=="open"||deck[i].open||over)return;deck[i].open=true;opened++;let bad=deck[i].type==="bad";fx(bad?"bad":"safe");let count=deck.filter(x=>x.type==="bad"&&x.open).length;if(count>=jk){over=true;fx("win");drawG1("WIN");return}if(opened>=must){turn=turn%playerCount+1;applyPlayerTheme(turn);phase="roll";opened=0;must=0;dice=1;setTimeout(()=>drawG1("GO"),300)}else drawG1(bad?"LOSE":"OK")}
+function rollG1(){if(phase!=="roll"||over)return;phase="rolling";fx("roll");drawG1("GO");setTimeout(()=>{dice=Math.floor(Math.random()*6)+1;must=Math.min(dice,deck.filter(x=>!x.open).length);opened=0;turnShots=0;phase="open";drawG1("OPEN")},650)}
+function flip(i){
+ if(phase!=="open"||deck[i].open||over)return;
+ deck[i].open=true;
+ opened++;
+ let bad=deck[i].type==="bad";
+ if(bad)turnShots++;
+ fx(bad?"bad":"safe");
+ let totalOpenedJokers=deck.filter(x=>x.type==="bad"&&x.open).length;
+ if(totalOpenedJokers>=jk){
+  phase="wait";
+  drawG1("JOKER x"+turnShots);
+  setTimeout(()=>finishTurnShots(turnShots,()=>{over=true;fx("win");drawG1("WIN")}),650);
+  return;
+ }
+ if(opened>=must){
+  phase="wait";
+  drawG1(turnShots?"JOKER x"+turnShots:"NO JOKER");
+  setTimeout(()=>finishTurnShots(turnShots,()=>{turn=turn%playerCount+1;applyPlayerTheme(turn);phase="roll";opened=0;must=0;turnShots=0;dice=1;drawG1("GO")}),650);
+ }else drawG1(bad?"JOKER":"OK")
+}
 
 /* Game2: FIXED camera reserve before drop */
 function game2Start(){screen="g2";g2={player:1,dice:1,need:0,placed:0,phase:"roll",tower:[],fall:false,debt:0,w:0,h:0,busy:false,pendingSlots:0,stab:100,best:+localStorage.getItem('diceTowerBest')||0};applyPlayerTheme(g2.player);ui.innerHTML=`<div class="title">DICE TOWER</div>${topbar()}${turnBanner(g2.player)}<div class="hud" style="--pc:${PCLR[(g2.player-1)%4]}"><div class="panel activeP">HEIGHT<span class="big" id="heightNow">0</span></div><div class="panel">${diceHTML()}</div><div class="panel">STAB<span class="big" id="stabNow">100%</span></div></div>${playerChips(g2.player)}<div class="stage" id="stage"><div class="towerMini" id="towerMini"></div><div class="centerLine"></div><div class="dropGuide"></div><div class="ghostGuide" id="ghost" style="display:none"></div><div class="ground"></div><div class="stack" id="stack"></div><div class="previewDice" id="preview" style="display:none"></div></div><div class="msg" id="g2msg">ROLL</div><div class="row"><button class="small red" onclick="selectScreen()">BACK</button><button class="small gold" onclick="game2Start()">RETRY</button></div>`;setTimeout(()=>{let r=document.getElementById("stage").getBoundingClientRect();g2.w=r.width;g2.h=r.height;updateStats()},30)}
@@ -167,11 +211,15 @@ function renderTower(){let stack=document.getElementById("stack");if(!stack)retu
 function nextG2(){
  if(g2.fall)return;
  g2.pendingSlots=0;
+ const pv=document.getElementById("preview");if(pv)pv.style.display="none";
+ const gh=document.getElementById("ghost");if(gh)gh.style.display="none";
+ advanceG2Player();
+}
+function advanceG2Player(){
+ if(g2.fall)return;
  g2.player=(g2.player%playerCount)+1;
  applyPlayerTheme(g2.player);
  g2.phase="roll";g2.need=0;g2.placed=0;dice=1;
- const pv=document.getElementById("preview");if(pv)pv.style.display="none";
- const gh=document.getElementById("ghost");if(gh)gh.style.display="none";
  const tb=document.querySelector(".turnBanner");if(tb)tb.outerHTML=turnBanner(g2.player);
  const chips=document.querySelector(".playerList");if(chips)chips.outerHTML=playerChips(g2.player);
  const hud=document.querySelector(".hud");if(hud)hud.style.setProperty("--pc",PCLR[(g2.player-1)%4]);
@@ -217,9 +265,60 @@ function collapseAnim(){
  });
  if(stack)stack.innerHTML="";
 }
-function collapseG2(){if(g2.fall)return;g2.fall=true;g2.phase="end";g2.pendingSlots=0;fx("bad");collapseAnim();let best=Math.max(g2.best||0,g2.tower.length);localStorage.setItem('diceTowerBest',best);document.getElementById("g2msg").textContent="LOSE "+g2.tower.length+" / BEST "+best;document.getElementById("stage").classList.add("warn");updateStats()}
+function collapseG2(){
+ if(g2.fall)return;
+ g2.fall=true;
+ g2.phase="end";
+ g2.pendingSlots=0;
+ fx("bad");
+ collapseAnim();
+ let best=Math.max(g2.best||0,g2.tower.length);
+ localStorage.setItem('diceTowerBest',best);
+ document.getElementById("g2msg").textContent="LOSE "+g2.tower.length+" / BEST "+best;
+ document.getElementById("stage").classList.add("warn");
+ updateStats();
+ setTimeout(()=>drinkShots(1,()=>{}),650);
+}
 document.addEventListener("click",e=>{if(screen==="g2"&&e.target.closest("#stage"))dropG2()});
 setInterval(()=>{if(screen==="g2"&&g2.tower?.length&&!g2.fall&&!g2.busy)renderTower()},120);
+
+function finishTurnShots(total,callback){
+ // After cards are visible, show cups only if this turn opened Jokers.
+ if(total>0)drinkShots(total,callback);
+ else if(callback)callback();
+}
+function drinkShots(total,callback){
+ const host=document.querySelector(".game");
+ if(!host){if(callback)callback();return}
+ let drank=0,busy=false;
+ const layer=document.createElement("div");
+ layer.className="shotTrans";
+ function paint(){
+  layer.innerHTML=`<div class="shotTray onlyCups">${Array.from({length:total},(_,i)=>`<div class="shotCup ${i<drank?"empty":""}" style="animation-delay:${i*.035}s"></div>`).join("")}</div>`;
+ }
+ paint();
+ host.appendChild(layer);
+ layer.addEventListener("click",e=>{
+  e.stopPropagation();
+  if(busy||drank>=total)return;
+  busy=true;
+  const cups=[...layer.querySelectorAll(".shotCup")];
+  const cup=cups[drank];
+  if(cup)cup.classList.add("drink");
+  const flash=document.createElement("div");
+  flash.className="shotFlash";
+  layer.appendChild(flash);
+  fx("drop");
+  setTimeout(()=>{
+   drank++;
+   paint();
+   if(drank>=total){
+    setTimeout(()=>{fx("win");layer.remove();if(callback)callback()},280);
+   }else busy=false;
+  },340);
+ });
+}
+
 function renderApp(){if(screen==="select")selectScreen();else if(screen==="g1")phase==="menu"?game1Menu():drawG1("");else game2Start()}
 selectScreen();
 </script>
